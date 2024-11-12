@@ -19,7 +19,7 @@ create_dir(PROGRESS_DIR)
 st.set_page_config(page_title="Language Learning App", layout="wide")
 
 authenticator = stauth.Authenticate(
-    dict(st.secrets['credentials']),
+    st.secrets['credentials'].to_dict(),
     st.secrets['cookie']['name'],
     st.secrets['cookie']['key'],
     st.secrets['cookie']['expiry_days'],
