@@ -36,24 +36,24 @@ def main():
         # Logout button
         authenticator.logout('Logout', 'sidebar')
 
-        # Optional: Update user details
-        with st.sidebar.expander("Update Details"):
-            if authenticator.update_user_details(st.session_state["username"], 'main'):
-                st.sidebar.success('Details updated successfully')
-                # Save updated config
-                with open('config.yaml', 'w') as file:
-                    yaml.dump(config, file, default_flow_style=False)
+        # # Optional: Update user details
+        # with st.sidebar.expander("Update Details"):
+        #     if authenticator.update_user_details(st.session_state["username"], 'main'):
+        #         st.sidebar.success('Details updated successfully')
+        #         # Save updated config
+        #         with open('config.yaml', 'w') as file:
+        #             yaml.dump(config, file, default_flow_style=False)
 
-        # Optional: Reset password
-        with st.sidebar.expander("Reset Password"):
-            try:
-                if authenticator.reset_password(st.session_state["username"], 'main'):
-                    st.sidebar.success('Password modified successfully')
-                    # Save updated config
-                    with open('config.yaml', 'w') as file:
-                        yaml.dump(config, file, default_flow_style=False)
-            except Exception as e:
-                st.sidebar.error(e)
+        # # Optional: Reset password
+        # with st.sidebar.expander("Reset Password"):
+        #     try:
+        #         if authenticator.reset_password(st.session_state["username"], 'main'):
+        #             st.sidebar.success('Password modified successfully')
+        #             # Save updated config
+        #             with open('config.yaml', 'w') as file:
+        #                 yaml.dump(config, file, default_flow_style=False)
+        #     except Exception as e:
+        #         st.sidebar.error(e)
         
         pages = [
         st.Page("sections/practice.py", title="Practice"),
@@ -94,23 +94,23 @@ def main():
         page = st.navigation(pages)
 
         # Registration
-        with st.expander('Register'):
-            if authenticator.register_user('main', clear_on_submit=True):
-                save_config(config)
+        # with st.expander('Register'):
+        #     if authenticator.register_user('main', clear_on_submit=True):
+        #         save_config(config)
 
-        # Optional: Forgot Password
-        with st.sidebar.expander("Forgot Password"):
-            try:
-                username_forgot, email_forgot, new_password = authenticator.forgot_password('main')
-                if username_forgot:
-                    st.sidebar.success('New password generated and sent securely')
+        # # Optional: Forgot Password
+        # with st.sidebar.expander("Forgot Password"):
+        #     try:
+        #         username_forgot, email_forgot, new_password = authenticator.forgot_password('main')
+        #         if username_forgot:
+        #             st.sidebar.success('New password generated and sent securely')
 
-                    with open('config.yaml', 'w') as file:
-                        yaml.dump(config, file, default_flow_style=False)
-                elif username_forgot == False:
-                    st.sidebar.error('Username not found')
-            except Exception as e:
-                st.sidebar.error(e)
+        #             with open('config.yaml', 'w') as file:
+        #                 yaml.dump(config, file, default_flow_style=False)
+        #         elif username_forgot == False:
+        #             st.sidebar.error('Username not found')
+        #     except Exception as e:
+        #         st.sidebar.error(e)
 
 if __name__ == "__main__":
     main()
