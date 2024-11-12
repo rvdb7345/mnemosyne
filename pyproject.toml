@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "vocab-builder"
+version = "0.1.0"
+description = ""
+authors = ["Robin <robin@vespertool.com>"]
+license = "mit"
+readme = "README.md"
+packages = [ { include = "*", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+streamlit = "*"
+gtts = "^2.5.3"
+bcrypt = "^4.2.0"
+streamlit-cookies-controller = "^0.0.4"
+streamlit-authenticator = "^0.4.1"
+
