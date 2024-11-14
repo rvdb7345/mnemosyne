@@ -6,3 +6,5 @@
 src/exercises/*
 
 __pycache__/
+src/exercises/
+.streamlit/
