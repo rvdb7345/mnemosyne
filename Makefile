@@ -4,7 +4,6 @@
 PYTHON_VERSION := 3.10
 POETRY := poetry
 VENV_PATH = .venv
-LOCAL_PRE_COMMIT = $(VENV_PATH)/bin/pre-commit
 
 # Check if 'python3.8' is installed
 ifeq (, $(shell which python$(PYTHON_VERSION)))
@@ -23,16 +22,15 @@ help:
 	@echo "Targets:"
 	@echo "  setup      Set up the virtual environment and install dependencies"
 	@echo "  venv       Create the virtual environment"
-	@echo "  pre-commit       Set up pre-commit"
 	@echo "  install    Install project dependencies"
 	@echo "  clean      Clean up the virtual environment and generated files"
 	@echo "  uninstall  Uninstall the virtual environment and dependencies"
 	@echo "  help       Show this help message"
 
 .PHONY: setup
-setup: venv install pre-commit
+setup: venv install
 
-.PHONY: setup
+.PHONY: venv
 venv:
 	@echo "Current directory: $(PWD)"
 	@echo "Creating virtual environment..."
@@ -49,8 +47,6 @@ install:
 	@$(POETRY) install --no-root
 	@echo "Dependencies installed."
 
-
-# prompt_example> make test PY=py36 OPTIONS="-- -s"
 .PHONY: test
 test:
 	@echo "Running Tests using Tox..."
@@ -60,9 +56,3 @@ test:
 clean:
 	@rm -rf $(VENV_PATH)
 	@rm -f poetry.lock
-
-# .PHONY: uninstall
-# uninstall:
-# 	@echo "Uninstalling the virtual environment and dependencies..."
-# 	@$(POETRY) env remove $(VENV_PATH)
-# 	@echo "Uninstallation complete."
