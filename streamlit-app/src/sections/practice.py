@@ -25,6 +25,19 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+# Define language options for TTS compatibility
+LANGUAGE_OPTIONS = {
+    "English": "en",
+    "Turkish": "tr",
+    "Spanish": "es",
+    "French": "fr",
+    "German": "de",
+    "Italian": "it",
+    "Dutch": "nl",
+    "Russian": "ru",
+    "Portuguese": "pt",
+}
+
 def show():
     st.header("Practice Exercises")
     
@@ -38,14 +51,25 @@ def show():
         st.info("No exercises available. Please upload an exercise.")
         st.stop()
     selected_exercise = st.sidebar.selectbox("Select an exercise", exercises)
-    direction = st.sidebar.radio("Select practice direction", ("Turkish to English", "English to Turkish"))
-    tolerance = st.sidebar.slider("Tolerance for typos (0 to 100)", min_value=0, max_value=100, value=80)
-    ignore_accents = st.sidebar.checkbox("Ignore accents in typing")
-    # Load the exercise data
+    
+    # Load the exercise data and determine language headers
     exercise_path = os.path.join(EXERCISES_DIR, username, selected_exercise)
     df = load_exercise(exercise_path)
     if df is None:
         st.stop()
+    
+    # Use the headers for dynamic language handling
+    source_language, target_language = df.columns[:2]
+    source_language_code = LANGUAGE_OPTIONS.get(source_language, "en")
+    target_language_code = LANGUAGE_OPTIONS.get(target_language, "en")
+    
+    direction = st.sidebar.radio(
+        f"Select practice direction ({source_language} to {target_language})",
+        (f"{source_language} to {target_language}", f"{target_language} to {source_language}")
+    )
+    tolerance = st.sidebar.slider("Tolerance for typos (0 to 100)", min_value=0, max_value=100, value=80)
+    ignore_accents = st.sidebar.checkbox("Ignore accents in typing")
+    
     # Progress file path per user
     user_progress_dir = os.path.join(PROGRESS_DIR, username)
     create_dir(user_progress_dir)
@@ -65,6 +89,7 @@ def show():
         st.session_state['current_word_pair'] = None
         st.session_state['clear_input'] = False
         st.session_state['loaded_progress'] = False
+        st.session_state['pronounce_answer_trigger'] = False  # Flag to trigger answer pronunciation
 
     # Reset session state if exercise or direction has changed
     if st.session_state['prev_exercise'] != selected_exercise or st.session_state['prev_direction'] != direction:
@@ -79,6 +104,7 @@ def show():
         st.session_state['current_word_pair'] = None
         st.session_state['clear_input'] = False
         st.session_state['loaded_progress'] = False
+        st.session_state['pronounce_answer_trigger'] = False
 
     # Load progress if it exists
     if os.path.exists(progress_file) and not st.session_state.get('loaded_progress_practice', False):
@@ -123,15 +149,15 @@ def show():
     if current_index < total_words:
         # Display the question and get user input
         current_word_pair = st.session_state['word_list'][current_index]
-        st.session_state['current_word_pair'] = current_word_pair  # Store current word pair
-        if direction == "Turkish to English":
-            question = current_word_pair['Turkish']
-            answer = current_word_pair['English']
-            tts_language = 'tr'
+        st.session_state['current_word_pair'] = current_word_pair
+        if direction == f"{source_language} to {target_language}":
+            question = current_word_pair[source_language]
+            answer = current_word_pair[target_language]
+            tts_language = source_language_code
         else:
-            question = current_word_pair['English']
-            answer = current_word_pair['Turkish']
-            tts_language = 'en'
+            question = current_word_pair[target_language]
+            answer = current_word_pair[source_language]
+            tts_language = target_language_code
 
         # Display the word in a flashcard
         st.markdown(f'<div class="flashcard">{question}</div>', unsafe_allow_html=True)
@@ -179,6 +205,11 @@ def show():
                 if current_word_pair not in st.session_state['mistakes']:
                     st.session_state['mistakes'].append(current_word_pair)
 
+            # Set flag to hear answer pronunciation automatically
+            st.session_state['pronounce_answer_trigger'] = True
+            st.session_state['pronounce_answer_text'] = answer
+            st.session_state['pronounce_answer_lang'] = target_language_code if direction == f"{source_language} to {target_language}" else source_language_code
+
             # Save progress with timestamp
             st.session_state['progress'].append({
                 'question': question,
@@ -194,8 +225,6 @@ def show():
             # Prepare for next question
             st.session_state['current_index'] += 1
             st.session_state['clear_input'] = True
-
-            # Since we're not rerunning, manually refresh the page elements
             st.rerun()
 
     else:
@@ -225,10 +254,11 @@ def show():
             st.success("Progress has been reset.")
             st.rerun()
 
-    # Non-intrusive options
+        
+        # Non-intrusive options
     if 'current_word_pair' in st.session_state and st.session_state['current_word_pair'] is not None:
         with st.expander("Options"):
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             with col1:
                 if st.button('Change Assessment'):
                     # Reverse the 'correct' value
@@ -264,5 +294,15 @@ def show():
                     if current_index - 1 >= total_words:
                         st.write("You have completed all words in this exercise!")
                         st.stop()
+            with col3:
+                    # Automatically pronounce the answer if the trigger flag is set
+                if st.button("Pronounce Answer"):
+                    # Reset the flag after pronouncing
+                    if 'pronounce_answer_text' in st.session_state:
+                        answer_audio_html = tts_audio(st.session_state['pronounce_answer_text'], st.session_state['pronounce_answer_lang'])
+                        st.markdown(answer_audio_html, unsafe_allow_html=True)
+                    else:
+                        st.markdown("No answer to pronounce yet", unsafe_allow_html=True)
 
+    
 show()

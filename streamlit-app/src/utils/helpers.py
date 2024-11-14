@@ -1,6 +1,6 @@
 import base64
 import difflib
-from io import BytesIO
+from io import BytesIO, StringIO
 import itertools
 import os
 import re
@@ -9,6 +9,20 @@ from gtts import gTTS
 import pandas as pd
 import streamlit as st
 
+
+# Language options with codes for gTTS compatibility
+LANGUAGE_OPTIONS = {
+    "English": "en",
+    "Turkish": "tr",
+    "Spanish": "es",
+    "French": "fr",
+    "German": "de",
+    "Italian": "it",
+    "Dutch": "nl",
+    "Russian": "ru",
+    "Portuguese": "pt",
+    # Add more languages as needed
+}
 
 def normalize_text(text):
     """Normalize text by removing accents and converting to lowercase."""
@@ -83,25 +97,39 @@ def save_credentials(credentials_file, credentials):
     df = pd.DataFrame(list(credentials.items()), columns=['username', 'password'])
     df.to_csv(credentials_file, index=False)
 
-def handle_exercise_upload(uploaded_file, custom_name, user, exercises_dir):
+def handle_exercise_upload(uploaded_file, custom_name, user, exercises_dir, source_language_name, target_language_name):
     if uploaded_file is not None and custom_name:
         try:
+            source_language_code = LANGUAGE_OPTIONS[source_language_name]
+            target_language_code = LANGUAGE_OPTIONS[target_language_name]
             if uploaded_file.name.endswith('.txt'):
-                df = pd.read_csv(uploaded_file, sep='\t', header=None, names=['Turkish', 'English'])
+                cleaned_lines = []
+                for line in uploaded_file:
+                    line = line.decode('utf-8').rstrip()
+                    parts = line.split('\t')
+                    cleaned_lines.append('\t'.join(parts[:2]))
+
+                from io import StringIO
+                cleaned_content = StringIO('\n'.join(cleaned_lines))
+                df = pd.read_csv(cleaned_content, sep='\t', header=None, names=[source_language_name, target_language_name])
+            
             elif uploaded_file.name.endswith('.csv'):
-                df = pd.read_csv(uploaded_file, header=None, names=['Turkish', 'English'])
+                df = pd.read_csv(uploaded_file, header=None, names=[source_language_name, target_language_name]).applymap(str.strip)
             else:
                 st.error("Unsupported file format.")
                 return
+
             user_exercises_dir = os.path.join(exercises_dir, user)
             os.makedirs(user_exercises_dir, exist_ok=True)
             save_path = os.path.join(user_exercises_dir, f"{custom_name}.csv")
             df.to_csv(save_path, index=False)
-            st.success(f"Exercise '{custom_name}' uploaded successfully!")
+            st.success(f"Exercise '{custom_name}' uploaded successfully with languages {source_language_name} to {target_language_name}!")
         except Exception as e:
             st.error(f"Error uploading exercise: {e}")
     else:
         st.error("Please provide both a file and a custom exercise name.")
+
+
 
 def get_progress_file(username, exercise, direction, progress_dir):
     filename = f"progress_{exercise}_{direction.replace(' ', '_')}.json"

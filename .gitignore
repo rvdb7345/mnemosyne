@@ -3,4 +3,6 @@
 /progress_duolingo_words.txt_Turkish_to_English.json
 
 .venv
-src/exercises/
+src/exercises/*
+
+__pycache__/
