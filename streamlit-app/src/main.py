@@ -1,12 +1,11 @@
 import streamlit as st
 import pandas as pd
+import json  # Import json for parsing progress data
 from utils.helpers import create_dir
 from utils.file_paths import add_project_to_path, ProjectPaths
+from streamlit_cookies_manager import EncryptedCookieManager
 
 st.set_page_config(page_title="Vocabulary Practice App", layout="wide")
-
-
-from streamlit_cookies_manager import EncryptedCookieManager
 
 # Initialize cookie manager
 cookies = EncryptedCookieManager(
@@ -63,18 +62,50 @@ def show_main_page():
     if choice == "Continue where you left off":
         # Load progress data from cookies into session_state
         st.session_state['progress_data'] = cookies['progress_data']
+        
+        # Parse the progress data to reconstruct exercise_df
+        try:
+            progress_json = json.loads(st.session_state['progress_data'])
+            word_list = progress_json.get('word_list', [])
+            if word_list:
+                st.session_state['exercise_df'] = pd.DataFrame(word_list)
+            else:
+                st.error("No word list found in the progress data.")
+                return
+        except json.JSONDecodeError:
+            st.error("Failed to decode progress data. Please ensure the progress file is valid.")
+            return
+
         # Navigate to Practice page
         st.session_state['page'] = 'practice'
         st.rerun()
+        
     elif choice == "Upload Progress":
         st.write("Upload your progress file to continue.")
         progress_file = st.file_uploader("Upload Progress File", type=['json'], key='progress_file_uploader')
         if progress_file is not None:
-            # Load progress data into session_state
-            st.session_state['progress_data'] = progress_file.getvalue().decode("utf-8")
-            # Navigate to Practice page
-            st.session_state['page'] = 'practice'
-            st.rerun()
+            try:
+                # Load progress data into session_state
+                progress_content = progress_file.getvalue().decode("utf-8")
+                st.session_state['progress_data'] = progress_content
+
+                # Parse the progress data to reconstruct exercise_df
+                progress_json = json.loads(st.session_state['progress_data'])
+                word_list = progress_json.get('word_list', [])
+                if word_list:
+                    st.session_state['exercise_df'] = pd.DataFrame(word_list)
+                else:
+                    st.error("No word list found in the progress file.")
+                    return
+
+                # Navigate to Practice page
+                st.session_state['page'] = 'practice'
+                st.rerun()
+            except json.JSONDecodeError:
+                st.error("Failed to decode progress file. Please upload a valid JSON file.")
+            except Exception as e:
+                st.error(f"An error occurred while uploading progress: {e}")
+
     elif choice == "Start New Exercise":
         st.write("Upload a new exercise file (CSV or TXT).")
         uploaded_file = st.file_uploader("Choose a file", type=['txt', 'csv'], key='exercise_file_uploader')
