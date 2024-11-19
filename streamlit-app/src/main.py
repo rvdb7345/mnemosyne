@@ -3,18 +3,12 @@ import pandas as pd
 import json  # Import json for parsing progress data
 from utils.helpers import create_dir
 from utils.file_paths import add_project_to_path, ProjectPaths
-from streamlit_cookies_manager import EncryptedCookieManager
+from streamlit_cookies_controller import CookieController
 
 st.set_page_config(page_title="Vocabulary Practice App", layout="wide")
 
 # Initialize cookie manager
-cookies = EncryptedCookieManager(
-    prefix="vocab_practice_app_",
-    password='your-secret-password'  # Replace with a secure password
-)
-
-if not cookies.ready():
-    st.stop()
+cookies = CookieController()
 
 pp = ProjectPaths()
 add_project_to_path(pp)

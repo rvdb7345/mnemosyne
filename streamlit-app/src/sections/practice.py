@@ -3,7 +3,7 @@ import random
 import json
 from datetime import datetime
 from utils.helpers import compare_strings, expand_parentheses, tts_audio
-
+from streamlit_cookies_controller import CookieController
 
 # Language options with codes for gTTS compatibility
 LANGUAGE_OPTIONS = {
@@ -18,7 +18,9 @@ LANGUAGE_OPTIONS = {
     "Portuguese": "pt",
 }
 
-def show(cookies):
+def show(dfasdf):
+    cookies = CookieController()
+
     st.markdown("""
     <style>
     .flashcard {
@@ -265,8 +267,7 @@ def show(cookies):
                 st.success("Progress has been reset.")
                 # Remove progress data from cookies
                 if 'progress_data' in cookies:
-                    del cookies['progress_data']
-                    cookies.save()
+                    cookies.remove('progress_data')
                 st.rerun()
 
         # Option to download progress
@@ -359,5 +360,4 @@ def save_progress_data(cookies):
     }
     st.session_state['progress_data_to_download'] = json.dumps(progress_data)
     # Save progress data to cookies
-    cookies['progress_data'] = st.session_state['progress_data_to_download']
-    cookies.save()
+    cookies.set('progress_data', st.session_state['progress_data_to_download'])
