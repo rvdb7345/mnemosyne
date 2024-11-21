@@ -45,11 +45,11 @@ def show_main_page():
     st.title("Vocabulary Practice App")
     st.write("Please select an option:")
 
+    options = ["Upload Progress", "Start New Exercise", "Select a Predefined Exercise"]
+    
     # Check if progress data is in cookies
     if cookies.get('progress_data'):
-        options = ["Continue where you left off", "Upload Progress", "Start New Exercise"]
-    else:
-        options = ["Upload Progress", "Start New Exercise"]
+        options += ["Continue where you left off"]
 
     choice = st.selectbox("Select an option", options, key='main_choice_selectbox')
 
@@ -117,7 +117,7 @@ def show_main_page():
             index=0,
             key='target_language_selectbox'
         )
-
+        
         if st.button("Upload Exercise", key='upload_exercise_button'):
             if uploaded_file is not None and custom_exercise_name:
                 try:
@@ -161,6 +161,28 @@ def show_main_page():
                     st.error(f"Error uploading exercise: {e}")
             else:
                 st.error("Please provide both a file and a custom exercise name.")
+                
+    elif choice == "Select a Predefined Exercise":
+        options = ["Select list", "Dutch Frequency List", "Spanish Frequency List", "Turkish Frequency List"]
+        prefab_exercise_choice = st.selectbox("Select an option", options, key='prefab_exercise_selectbox')
+        
+        if prefab_exercise_choice != "Select list":
+            if prefab_exercise_choice == "Dutch Frequency List":
+                from standard_exercises.standard_exercise_definition import DutchVocabList
+                vocab_list = DutchVocabList()
+                df = vocab_list.load_exercise()
+            elif prefab_exercise_choice == "Spanish Frequency List":
+                from standard_exercises.standard_exercise_definition import SpanishVocabList
+                vocab_list = SpanishVocabList()
+                df = vocab_list.load_exercise()
+
+            st.session_state['exercise_df'] = df
+            st.session_state['source_language'] = vocab_list.source_language_name
+            st.session_state['target_language'] = vocab_list.target_language_name
+            st.session_state['exercise_name'] = vocab_list.exercise_name
+            # Navigate to Practice page
+            st.session_state['page'] = 'practice'
+            st.rerun()
 
 def show_practice_page():
     from sections import practice
