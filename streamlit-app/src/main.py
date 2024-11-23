@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-import json  # Import json for parsing progress data
+import json
 from utils.helpers import create_dir
 from utils.file_paths import add_project_to_path, ProjectPaths
 from streamlit_cookies_controller import CookieController
@@ -16,7 +16,6 @@ add_project_to_path(pp)
 # Initialize base directory
 EXERCISES_DIR = 'exercises'
 create_dir(EXERCISES_DIR)
-
 
 # Language options with codes for gTTS compatibility
 LANGUAGE_OPTIONS = {
@@ -46,7 +45,7 @@ def show_main_page():
     st.write("Please select an option:")
 
     options = ["Upload Progress", "Start New Exercise", "Select a Predefined Exercise"]
-    
+
     # Check if progress data is in cookies
     if cookies.get('progress_data'):
         options += ["Continue where you left off"]
@@ -55,43 +54,34 @@ def show_main_page():
 
     if choice == "Continue where you left off":
         # Load progress data from cookies into session_state
-        st.session_state['progress_data'] = cookies['progress_data']
-        
-        # Parse the progress data to reconstruct exercise_df
-        try:
-            progress_json = json.loads(st.session_state['progress_data'])
-            word_list = progress_json.get('word_list', [])
-            if word_list:
-                st.session_state['exercise_df'] = pd.DataFrame(word_list)
-            else:
-                st.error("No word list found in the progress data.")
-                return
-        except json.JSONDecodeError:
-            st.error("Failed to decode progress data. Please ensure the progress file is valid.")
-            return
+        progress_content = cookies.get('progress_data')
+        if progress_content:
+            st.session_state['progress_data'] = json.loads(progress_content)
+            # Set other necessary session state variables
+            st.session_state['exercise_df'] = pd.DataFrame(st.session_state['progress_data'].get('word_list', []))
+            st.session_state['source_language'] = st.session_state['progress_data'].get('source_language', 'Source')
+            st.session_state['target_language'] = st.session_state['progress_data'].get('target_language', 'Target')
+            st.session_state['exercise_name'] = st.session_state['progress_data'].get('exercise_name', 'Exercise')
+            st.session_state['practice_started'] = False
+            # Navigate to Practice page
+            st.session_state['page'] = 'practice'
+            st.rerun()
+        else:
+            st.error("No progress data found in cookies.")
 
-        # Navigate to Practice page
-        st.session_state['page'] = 'practice'
-        st.rerun()
-        
     elif choice == "Upload Progress":
         st.write("Upload your progress file to continue.")
         progress_file = st.file_uploader("Upload Progress File", type=['json'], key='progress_file_uploader')
         if progress_file is not None:
             try:
-                # Load progress data into session_state
                 progress_content = progress_file.getvalue().decode("utf-8")
-                st.session_state['progress_data'] = progress_content
-
-                # Parse the progress data to reconstruct exercise_df
-                progress_json = json.loads(st.session_state['progress_data'])
-                word_list = progress_json.get('word_list', [])
-                if word_list:
-                    st.session_state['exercise_df'] = pd.DataFrame(word_list)
-                else:
-                    st.error("No word list found in the progress file.")
-                    return
-
+                st.session_state['progress_data'] = json.loads(progress_content)
+                # Set other necessary session state variables
+                st.session_state['exercise_df'] = pd.DataFrame(st.session_state['progress_data'].get('word_list', []))
+                st.session_state['source_language'] = st.session_state['progress_data'].get('source_language', 'Source')
+                st.session_state['target_language'] = st.session_state['progress_data'].get('target_language', 'Target')
+                st.session_state['exercise_name'] = st.session_state['progress_data'].get('exercise_name', 'Exercise')
+                st.session_state['practice_started'] = False
                 # Navigate to Practice page
                 st.session_state['page'] = 'practice'
                 st.rerun()
@@ -117,7 +107,7 @@ def show_main_page():
             index=0,
             key='target_language_selectbox'
         )
-        
+
         if st.button("Upload Exercise", key='upload_exercise_button'):
             if uploaded_file is not None and custom_exercise_name:
                 try:
@@ -154,6 +144,8 @@ def show_main_page():
                     st.session_state['source_language'] = source_language_name
                     st.session_state['target_language'] = target_language_name
                     st.session_state['exercise_name'] = custom_exercise_name
+                    st.session_state['practice_started'] = False
+                    st.session_state['loaded_progress_practice'] = False
                     # Navigate to Practice page
                     st.session_state['page'] = 'practice'
                     st.rerun()
@@ -161,11 +153,11 @@ def show_main_page():
                     st.error(f"Error uploading exercise: {e}")
             else:
                 st.error("Please provide both a file and a custom exercise name.")
-                
+
     elif choice == "Select a Predefined Exercise":
         options = ["Select list", "Dutch Frequency List", "Spanish Frequency List", "Turkish Frequency List"]
         prefab_exercise_choice = st.selectbox("Select an option", options, key='prefab_exercise_selectbox')
-        
+
         if prefab_exercise_choice != "Select list":
             if prefab_exercise_choice == "Dutch Frequency List":
                 from standard_exercises.standard_exercise_definition import DutchVocabList
@@ -180,6 +172,8 @@ def show_main_page():
             st.session_state['source_language'] = vocab_list.source_language_name
             st.session_state['target_language'] = vocab_list.target_language_name
             st.session_state['exercise_name'] = vocab_list.exercise_name
+            st.session_state['practice_started'] = False
+            st.session_state['loaded_progress_practice'] = False
             # Navigate to Practice page
             st.session_state['page'] = 'practice'
             st.rerun()
