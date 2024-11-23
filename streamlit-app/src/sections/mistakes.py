@@ -1,70 +1,27 @@
 import streamlit as st
-import json
 from sections.components import render_flashcard, render_feedback, apply_custom_css
 from utils.helpers import compare_strings, expand_parentheses, tts_audio, LANGUAGE_OPTIONS
 
-def show_practice(practice_session, cookies):
+def show_mistakes(practice_session, cookies):
     apply_custom_css()
-    practice_session.current_mode = 'practice'  # Set mode to 'practice'
+    practice_session.current_mode = 'mistakes'  # Set mode to 'mistakes'
 
-    st.title("Practice New Words")
+    st.title("Practice Mistakes")
 
-    # Check if we have exercise data
-    if practice_session.exercise_df is None or practice_session.exercise_df.empty:
-        st.error("No exercise data found. Please go back and upload an exercise file.")
-        st.stop()
+    if not practice_session.mistakes:
+        st.info("No mistakes to practice.")
+        return
 
-    # Initialize direction options if not set
-    if not practice_session.direction_options:
-        practice_session.direction_options = [
-            f"{practice_session.source_language} to {practice_session.target_language}",
-            f"{practice_session.target_language} to {practice_session.source_language}"
-        ]
-        practice_session.direction = practice_session.direction_options[0]
-        practice_session.direction_radio = practice_session.direction
-
-    # Sidebar elements for direction, tolerance, and ignore accents
-    source_language = practice_session.source_language
-    target_language = practice_session.target_language
-
-    selected_direction = st.sidebar.radio(
-        f"Select practice direction",
-        practice_session.direction_options,
-        index=practice_session.direction_options.index(practice_session.direction_radio)
-    )
-
-    if selected_direction != practice_session.direction_radio:
-        practice_session.direction_radio = selected_direction
-        practice_session.direction = practice_session.direction_radio
-        # Load progress for the new direction
-        practice_session.load_progress()
-        st.rerun()
-
-    practice_session.tolerance = st.sidebar.slider(
-        "Tolerance for typos (0 to 100)",
-        min_value=0,
-        max_value=100,
-        value=practice_session.tolerance
-    )
-
-    practice_session.ignore_accents = st.sidebar.checkbox(
-        "Ignore accents",
-        value=practice_session.ignore_accents
-    )
-
-    if not practice_session.practice_started or practice_session.current_mode != 'practice':
-        if st.button('Start Practice', key='start_practice_button'):
-            # Initialize practice session variables
-            practice_session.practice_started = True
-            practice_session.current_mode = 'practice'
-            practice_session.load_progress()
-            st.rerun()
+    # Initialize the mistakes practice session if not started or mode changed
+    if not practice_session.practice_started or practice_session.current_mode != 'mistakes':
+        practice_session.practice_mistakes()
+        practice_session.current_mode = 'mistakes'
 
     # Proceed with the practice logic
-    if practice_session.practice_started and practice_session.current_mode == 'practice':
-        practice_logic(practice_session, cookies)
+    practice_logic(practice_session, cookies)
 
 def practice_logic(practice_session, cookies):
+    # Similar to the practice_logic in practice.py, but operates on mistakes
     source_language = practice_session.source_language
     target_language = practice_session.target_language
     source_language_code = LANGUAGE_OPTIONS.get(source_language, "en")
@@ -149,20 +106,9 @@ def practice_logic(practice_session, cookies):
             if correct:
                 feedback = f"Correct! Your answer: **{original_ans}**"
                 practice_session.last_feedback_message = ('success', feedback)
-                if current_word_pair in practice_session.mistakes:
-                    practice_session.mistakes.remove(current_word_pair)
             else:
                 feedback = f"Incorrect! Your answer: **{user_input}**. Acceptable answers were: **{', '.join(acceptable_answers)}**"
                 practice_session.last_feedback_message = ('error', feedback)
-                if current_word_pair not in practice_session.mistakes:
-                    practice_session.mistakes.append(current_word_pair)
-
-            # Set flag to hear answer pronunciation automatically
-            practice_session.pronounce_answer_trigger = True
-            practice_session.pronounce_answer_text = answer
-            practice_session.pronounce_answer_lang = (
-                target_language_code if direction == f"{source_language} to {target_language}" else source_language_code
-            )
 
             # Update progress
             practice_session.update_progress(question, user_input, answer, correct, current_word_pair)
@@ -176,31 +122,13 @@ def practice_logic(practice_session, cookies):
             st.rerun()
 
     else:
-        st.write("You have completed all words in this exercise!")
+        st.write("You have completed all mistakes!")
 
-    if st.button("Reset Progress"):
-        practice_session.reset_progress()
+    if st.button("Reset Mistakes Progress"):
+        practice_session.practice_mistakes()
         practice_session.save_progress_data(cookies)
-        st.success("Progress has been reset.")
-        # Remove progress data from cookies
-        if 'progress_data' in cookies:
-            del cookies['progress_data']
+        st.success("Mistakes progress has been reset.")
         st.rerun()
-
-    # Option to download progress
-    if st.button("Generate Downloadable Progress"):
-        # Save current progress data
-        practice_session.save_progress_data(cookies)
-        # Prepare progress data
-        progress_data = practice_session.progress_data
-        progress_json = json.dumps(progress_data)
-        # Create a download button
-        st.download_button(
-            label="Download Progress",
-            data=progress_json,
-            file_name=f"{practice_session.exercise_name}_progress.json",
-            mime="application/json"
-        )
 
     # Non-intrusive options
     if practice_session.current_word_pair:
@@ -219,38 +147,23 @@ def practice_logic(practice_session, cookies):
 def change_assessment(practice_session, cookies):
     # Reverse the 'correct' value
     practice_session.progress[-1]['correct'] = not practice_session.progress[-1]['correct']
-    # Update mistakes list
-    current_word_pair = practice_session.current_word_pair
-    if practice_session.progress[-1]['correct']:
-        if current_word_pair in practice_session.mistakes:
-            practice_session.mistakes.remove(current_word_pair)
-        feedback = f"Corrected to correct. Your answer: **{practice_session.progress[-1]['your_answer']}**"
-        st.success(feedback)
-    else:
-        if current_word_pair not in practice_session.mistakes:
-            practice_session.mistakes.append(current_word_pair)
-        feedback = f"Corrected to incorrect. Your answer: **{practice_session.progress[-1]['your_answer']}**"
-        st.error(feedback)
     # Save progress data
     practice_session.save_progress_data(cookies)
 
 def remove_current_question(practice_session, cookies):
     current_index = practice_session.current_index
-    current_word_pair = practice_session.current_word_pair
     # Remove the current word pair
     practice_session.word_list.pop(current_index - 1)
-    if current_word_pair in practice_session.mistakes:
-        practice_session.mistakes.remove(current_word_pair)
     # Remove the last progress entry
     practice_session.progress.pop()
     # Adjust total_words since the word_list has changed
     total_words = len(practice_session.word_list)
     if current_index - 1 >= total_words:
-        st.write("You have completed all words in this exercise!")
+        st.write("You have completed all mistakes!")
         st.stop()
     # Save progress data
     practice_session.save_progress_data(cookies)
-    st.success('Question removed from test set.')
+    st.success('Question removed from mistakes set.')
 
 def pronounce_answer(practice_session):
     if practice_session.pronounce_answer_text:
