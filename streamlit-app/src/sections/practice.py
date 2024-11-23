@@ -2,7 +2,126 @@ import streamlit as st
 import random
 import json
 from datetime import datetime
+from dataclasses import dataclass, field
 from utils.helpers import compare_strings, expand_parentheses, tts_audio, LANGUAGE_OPTIONS
+import pandas as pd
+
+@dataclass
+class PracticeSession:
+    # Fields
+    practice_started: bool = False
+    progress_data: dict = field(default_factory=dict)
+    direction: str = ''
+    direction_radio: str = ''
+    tolerance: int = 80
+    ignore_accents: bool = False
+    exercise_df: pd.DataFrame = None
+    exercise_name: str = ''
+    source_language: str = 'Source'
+    target_language: str = 'Target'
+    direction_options: list = field(default_factory=list)
+    word_list: list = field(default_factory=list)
+    current_index: int = 0
+    mistakes: list = field(default_factory=list)
+    progress: list = field(default_factory=list)
+    pronounce_answer_trigger: bool = False
+    pronounce_answer_text: str = ''
+    pronounce_answer_lang: str = ''
+    current_word_pair: dict = field(default_factory=dict)
+    clear_input: bool = False
+    last_feedback_message: tuple = None  # Feedback message to display
+
+    # Methods (same as before, with minor adjustments)
+    def initialize_base_settings(self):
+        """Initialize or reset the base settings for the practice session."""
+        self.word_list = self.exercise_df.to_dict('records')
+        random.shuffle(self.word_list)
+        self.current_index = 0
+        self.mistakes = []
+        self.progress = []
+        self.pronounce_answer_trigger = False
+        self.pronounce_answer_text = ''
+        self.pronounce_answer_lang = ''
+        self.current_word_pair = {}
+        self.clear_input = True
+        self.last_feedback_message = None  # Reset feedback message
+
+    def reset_progress(self):
+        """Reset the progress for the current direction."""
+        self.initialize_base_settings()
+        # Remove progress data for current direction
+        direction_key = self.direction.replace(" ", "_").lower()
+        progress_data = self.progress_data or {}
+        if direction_key in progress_data:
+            del progress_data[direction_key]
+        self.progress_data = progress_data
+
+    def load_progress(self):
+        """Load progress for the current direction."""
+        direction_key = self.direction.replace(" ", "_").lower()
+        progress_data = self.progress_data or {}
+        if direction_key in progress_data:
+            direction_progress = progress_data[direction_key]
+            self.word_list = direction_progress['word_list']
+            self.current_index = direction_progress['current_index']
+            self.mistakes = direction_progress['mistakes']
+            self.progress = direction_progress['progress']
+            self.pronounce_answer_trigger = False
+            self.practice_started = True
+            self.last_feedback_message = None  # Reset feedback message
+        else:
+            # Initialize for the new direction
+            self.initialize_base_settings()
+
+    def save_progress_data(self, cookies):
+        """Save progress data to the session and cookies."""
+        progress_data = self.progress_data or {}
+        direction_key = self.direction.replace(" ", "_").lower()
+        progress_data[direction_key] = {
+            'word_list': self.word_list,
+            'current_index': self.current_index,
+            'mistakes': self.mistakes,
+            'progress': self.progress,
+            # Exclude 'feedback_message' to prevent serialization issues
+        }
+        # Include additional session state data
+        progress_data['source_language'] = self.source_language
+        progress_data['target_language'] = self.target_language
+        progress_data['exercise_name'] = self.exercise_name
+        progress_data['tolerance'] = self.tolerance
+        progress_data['ignore_accents'] = self.ignore_accents
+        # Save progress data to practice_session for downloading
+        self.progress_data = progress_data
+        progress_json = json.dumps(progress_data)
+        # Save progress data to cookies
+        cookies.set('progress_data', progress_json)
+
+    def update_progress(self, question, user_input, answer, correct, current_word_pair):
+        """Update the progress after an answer is submitted."""
+        self.progress.append({
+            'question': question,
+            'your_answer': user_input,
+            'correct_answer': answer,
+            'correct': correct,
+            'timestamp': datetime.now().isoformat(),
+            'word_pair': current_word_pair
+        })
+        self.current_index += 1
+        self.clear_input = True
+
+    def practice_mistakes(self):
+        """Set up the session to practice mistakes."""
+        self.word_list = self.mistakes.copy()
+        random.shuffle(self.word_list)
+        self.current_index = 0
+        self.mistakes = []
+        self.progress = []
+        self.last_feedback_message = None
+        self.clear_input = True
+        self.current_word_pair = None
+        self.pronounce_answer_trigger = False
+        self.pronounce_answer_text = ''
+        self.pronounce_answer_lang = ''
 
 def show(cookies):
     st.markdown("""
@@ -30,155 +149,81 @@ def show(cookies):
         st.error("No exercise data found. Please go back and upload an exercise file.")
         st.stop()
 
-    # Initialize practice session if not already started
-    if 'practice_started' not in st.session_state:
-        st.session_state['practice_started'] = False
+    # Initialize practice session if not already in session_state
+    if 'practice_session' not in st.session_state:
+        st.session_state['practice_session'] = PracticeSession()
+        # Set initial values from session_state
+        practice_session = st.session_state['practice_session']
+        practice_session.exercise_df = st.session_state['exercise_df']
+        practice_session.exercise_name = st.session_state.get('exercise_name', 'Exercise')
+        practice_session.source_language = st.session_state.get('source_language', 'Source')
+        practice_session.target_language = st.session_state.get('target_language', 'Target')
+        practice_session.direction_options = [
+            f"{practice_session.source_language} to {practice_session.target_language}",
+            f"{practice_session.target_language} to {practice_session.source_language}"
+        ]
+        practice_session.direction = practice_session.direction_options[0]
+        practice_session.direction_radio = practice_session.direction
+    else:
+        practice_session = st.session_state['practice_session']
 
     # Sidebar elements for direction, tolerance, and ignore accents
-    source_language = st.session_state.get('source_language', 'Source')
-    target_language = st.session_state.get('target_language', 'Target')
+    source_language = practice_session.source_language
+    target_language = practice_session.target_language
 
-    direction_options = [f"{source_language} to {target_language}", f"{target_language} to {source_language}"]
-    if 'direction' not in st.session_state:
-        st.session_state['direction'] = direction_options[0]
-
-    if 'direction_radio' not in st.session_state:
-        st.session_state['direction_radio'] = st.session_state['direction']
-
-    def direction_changed():
-        st.session_state['direction'] = st.session_state['direction_radio']
-        # Load progress for the new direction
-        load_progress()
-
-    st.sidebar.radio(
+    selected_direction = st.sidebar.radio(
         f"Select practice direction ({source_language} to {target_language})",
-        direction_options,
-        key='direction_radio',
-        on_change=direction_changed
+        practice_session.direction_options,
+        index=practice_session.direction_options.index(practice_session.direction_radio)
     )
-    st.sidebar.slider(
+
+    if selected_direction != practice_session.direction_radio:
+        practice_session.direction_radio = selected_direction
+        practice_session.direction = practice_session.direction_radio
+        # Load progress for the new direction
+        practice_session.load_progress()
+        st.rerun()
+
+    practice_session.tolerance = st.sidebar.slider(
         "Tolerance for typos (0 to 100)",
         min_value=0,
         max_value=100,
-        value=st.session_state.get('tolerance', 80),
-        key='tolerance_slider'
+        value=practice_session.tolerance
     )
-    st.sidebar.checkbox(
+
+    practice_session.ignore_accents = st.sidebar.checkbox(
         "Ignore accents",
-        value=st.session_state.get('ignore_accents', False),
-        key='ignore_accents_checkbox'
+        value=practice_session.ignore_accents
     )
 
-    # Update tolerance and ignore_accents in session_state
-    st.session_state['tolerance'] = st.session_state['tolerance_slider']
-    st.session_state['ignore_accents'] = st.session_state['ignore_accents_checkbox']
-
-    if not st.session_state['practice_started']:
-        df = st.session_state['exercise_df']
-        st.session_state['exercise_name'] = st.session_state.get('exercise_name', 'Exercise')
-        st.session_state['progress_data'] = st.session_state.get('progress_data', {})
-
+    if not practice_session.practice_started:
         if st.button('Start Practice', key='start_practice_button'):
             # Initialize practice session variables
-            initialize_practice_session(df)
+            practice_session.practice_started = True
+            practice_session.load_progress()
             st.rerun()
 
     # Proceed with the practice logic
-    if st.session_state['practice_started']:
-        practice_logic(cookies)
+    if practice_session.practice_started:
+        practice_logic(practice_session, cookies)
 
-def initialize_practice_session(df):
-    # Initialize practice session variables
-    st.session_state['practice_started'] = True
-    st.session_state['progress_data'] = st.session_state.get('progress_data', {})
-    st.session_state['direction'] = st.session_state['direction_radio']
-    # Load progress for the current direction if available
-    load_progress()
-
-def load_progress():
-    direction_key = st.session_state['direction'].replace(" ", "_").lower()
-    progress_data = st.session_state.get('progress_data', {})
-
-    if direction_key in progress_data:
-        direction_progress = progress_data[direction_key]
-        st.session_state['word_list'] = direction_progress['word_list']
-        st.session_state['current_index'] = direction_progress['current_index']
-        st.session_state['mistakes'] = direction_progress['mistakes']
-        st.session_state['progress'] = direction_progress['progress']
-        st.session_state['feedback_message'] = direction_progress.get('feedback_message', None)
-        st.session_state['pronounce_answer_trigger'] = False
-        st.session_state['practice_started'] = True
-    else:
-        # Initialize for the new direction
-        df = st.session_state['exercise_df']
-        st.session_state['word_list'] = df.to_dict('records')
-        random.shuffle(st.session_state['word_list'])
-        st.session_state['current_index'] = 0
-        st.session_state['mistakes'] = []
-        st.session_state['progress'] = []
-        st.session_state['feedback_message'] = None
-        st.session_state['pronounce_answer_trigger'] = False
-        st.session_state['practice_started'] = True
-
-def save_progress_data(cookies):
-    # Prepare progress data
-    progress_data = st.session_state.get('progress_data', {})
-    direction_key = st.session_state['direction'].replace(" ", "_").lower()
-    progress_data[direction_key] = {
-        'word_list': st.session_state['word_list'],
-        'current_index': st.session_state['current_index'],
-        'mistakes': st.session_state['mistakes'],
-        'progress': st.session_state['progress'],
-        'feedback_message': st.session_state.get('feedback_message', None),
-    }
-    # Include additional session state data
-    progress_data['source_language'] = st.session_state['source_language']
-    progress_data['target_language'] = st.session_state['target_language']
-    progress_data['exercise_name'] = st.session_state['exercise_name']
-    progress_data['tolerance'] = st.session_state['tolerance']
-    progress_data['ignore_accents'] = st.session_state['ignore_accents']
-
-    # Save progress data to session_state for downloading
-    st.session_state['progress_data'] = progress_data
-    progress_json = json.dumps(progress_data)
-    # Save progress data to cookies
-    cookies.set('progress_data', progress_json)
-
-def reset_progress():
-    # Reset progress for the current direction
-    st.session_state['current_index'] = 0
-    st.session_state['mistakes'] = []
-    st.session_state['progress'] = []
-    st.session_state['feedback_message'] = None
-    st.session_state['current_word_pair'] = None
-    st.session_state['clear_input'] = True
-    st.session_state['pronounce_answer_trigger'] = False
-    st.session_state['pronounce_answer_text'] = ''
-    st.session_state['pronounce_answer_lang'] = ''
-    # Remove progress data for current direction
-    direction_key = st.session_state['direction'].replace(" ", "_").lower()
-    progress_data = st.session_state.get('progress_data', {})
-    if direction_key in progress_data:
-        del progress_data[direction_key]
-    st.session_state['progress_data'] = progress_data
-
-def practice_logic(cookies):
-    source_language = st.session_state['source_language']
-    target_language = st.session_state['target_language']
+def practice_logic(practice_session, cookies):
+    source_language = practice_session.source_language
+    target_language = practice_session.target_language
     source_language_code = LANGUAGE_OPTIONS.get(source_language, "en")
     target_language_code = LANGUAGE_OPTIONS.get(target_language, "en")
-    direction = st.session_state['direction']
-    tolerance = st.session_state['tolerance']
-    ignore_accents = st.session_state['ignore_accents']
-    exercise_name = st.session_state['exercise_name']
+    direction = practice_session.direction
+    tolerance = practice_session.tolerance
+    ignore_accents = practice_session.ignore_accents
+    exercise_name = practice_session.exercise_name
 
     # Calculate counts
-    num_correct = sum(1 for item in st.session_state['progress'] if item['correct'])
-    num_incorrect = sum(1 for item in st.session_state['progress'] if not item['correct'])
+    num_correct = sum(1 for item in practice_session.progress if item['correct'])
+    num_incorrect = sum(1 for item in practice_session.progress if not item['correct'])
 
     # Display progress bar and current word number
-    total_words = len(st.session_state['word_list'])
-    current_index = st.session_state['current_index']
+    total_words = len(practice_session.word_list)
+    current_index = practice_session.current_index
 
     if current_index < total_words:
         progress_percent = current_index / total_words
@@ -188,24 +233,24 @@ def practice_logic(cookies):
     st.write(f"Word {min(current_index + 1, total_words)} of {total_words} — ✅ {num_correct} | ❌ {num_incorrect}")
 
     # Display feedback message (if any)
-    if 'feedback_message' in st.session_state and st.session_state['feedback_message'] is not None:
-        msg_type, msg = st.session_state['feedback_message']
+    if practice_session.last_feedback_message is not None:
+        msg_type, msg = practice_session.last_feedback_message
         if msg_type == 'success':
             st.success(msg, icon="✅")
         else:
             st.error(msg, icon="❌")
 
     # Before creating the text_input, check if we need to clear the input
-    if st.session_state.get('clear_input', False):
+    if practice_session.clear_input:
         if 'user_input' in st.session_state:
             del st.session_state['user_input']
-        st.session_state['clear_input'] = False
+        practice_session.clear_input = False
 
     # Main quiz logic
     if current_index < total_words:
         # Display the question and get user input
-        current_word_pair = st.session_state['word_list'][current_index]
-        st.session_state['current_word_pair'] = current_word_pair
+        current_word_pair = practice_session.word_list[current_index]
+        practice_session.current_word_pair = current_word_pair
         if direction == f"{source_language} to {target_language}":
             question = current_word_pair[source_language]
             answer = current_word_pair[target_language]
@@ -230,10 +275,10 @@ def practice_logic(cookies):
 
         if submit:
             # Clear previous feedback message
-            st.session_state['feedback_message'] = None
+            practice_session.last_feedback_message = None
 
-            # Get the user's input from session state
-            user_input = st.session_state['user_input']
+            # Get the user's input
+            user_input = st.session_state.get('user_input', '')
 
             # Process the answer
             acceptable_answers_raw = [ans.strip() for ans in answer.split(',')]
@@ -249,142 +294,127 @@ def practice_logic(cookies):
                     correct = True
                     break
 
-            # Update feedback message in session state
+            # Update feedback message
             if correct:
                 feedback = f"Correct! Your answer: **{original_ans}**"
-                st.session_state['feedback_message'] = ('success', feedback)
-                if current_word_pair in st.session_state['mistakes']:
-                    st.session_state['mistakes'].remove(current_word_pair)
+                practice_session.last_feedback_message = ('success', feedback)
+                if current_word_pair in practice_session.mistakes:
+                    practice_session.mistakes.remove(current_word_pair)
             else:
                 feedback = f"Incorrect! Your answer: **{user_input}**. Acceptable answers were: **{', '.join(acceptable_answers)}**"
-                st.session_state['feedback_message'] = ('error', feedback)
-                if current_word_pair not in st.session_state['mistakes']:
-                    st.session_state['mistakes'].append(current_word_pair)
+                practice_session.last_feedback_message = ('error', feedback)
+                if current_word_pair not in practice_session.mistakes:
+                    practice_session.mistakes.append(current_word_pair)
 
             # Set flag to hear answer pronunciation automatically
-            st.session_state['pronounce_answer_trigger'] = True
-            st.session_state['pronounce_answer_text'] = answer
-            st.session_state['pronounce_answer_lang'] = (
+            practice_session.pronounce_answer_trigger = True
+            practice_session.pronounce_answer_text = answer
+            practice_session.pronounce_answer_lang = (
                 target_language_code if direction == f"{source_language} to {target_language}" else source_language_code
             )
 
-            # Save progress with timestamp
-            st.session_state['progress'].append({
-                'question': question,
-                'your_answer': user_input,
-                'correct_answer': answer,
-                'correct': correct,
-                'timestamp': datetime.now().isoformat(),
-                'word_pair': current_word_pair
-            })
-            # Update current index
-            st.session_state['current_index'] += 1
-            st.session_state['clear_input'] = True
+            # Update progress
+            practice_session.update_progress(question, user_input, answer, correct, current_word_pair)
 
-            # Save progress data to session_state and cookies
-            save_progress_data(cookies)
+            # Save progress data
+            practice_session.save_progress_data(cookies)
+
+            # Clear the user input
+            practice_session.clear_input = True
 
             st.rerun()
 
     else:
         st.write("You have completed all words in this exercise!")
 
-        # Option to practice mistakes
-        if st.button("Practice Mistakes"):
-            if st.session_state['mistakes']:
-                st.session_state['word_list'] = st.session_state['mistakes']
-                random.shuffle(st.session_state['word_list'])
-                st.session_state['current_index'] = 0
-                st.session_state['mistakes'] = []
-                st.session_state['progress'] = []
-                st.session_state['feedback_message'] = None
-                st.session_state['clear_input'] = True
-                st.session_state['current_word_pair'] = None
-                st.session_state['pronounce_answer_trigger'] = False
-                st.session_state['pronounce_answer_text'] = ''
-                st.session_state['pronounce_answer_lang'] = ''
-                save_progress_data(cookies)
-                st.rerun()
-            else:
-                st.info("No mistakes to practice.")
-        if st.button("Reset Progress"):
-            reset_progress()
-            st.success("Progress has been reset.")
-            # Remove progress data from cookies
-            if 'progress_data' in cookies:
-                cookies.delete('progress_data')
+    # Option to practice mistakes at any time
+    if st.button("Practice Mistakes"):
+        if practice_session.mistakes:
+            practice_session.practice_mistakes()
+            practice_session.save_progress_data(cookies)
             st.rerun()
+        else:
+            st.info("No mistakes to practice.")
+
+    if st.button("Reset Progress"):
+        practice_session.reset_progress()
+        practice_session.save_progress_data(cookies)
+        st.success("Progress has been reset.")
+        # Remove progress data from cookies
+        if 'progress_data' in cookies:
+            cookies.delete('progress_data')
+        st.rerun()
 
     # Option to download progress
     if st.button("Generate Downloadable Progress"):
         # Save current progress data
-        save_progress_data(cookies)
+        practice_session.save_progress_data(cookies)
         # Prepare progress data
-        progress_data = st.session_state.get('progress_data', {})
+        progress_data = practice_session.progress_data
         progress_json = json.dumps(progress_data)
         # Create a download button
         st.download_button(
             label="Download Progress",
             data=progress_json,
-            file_name=f"{st.session_state['exercise_name']}_progress.json",
+            file_name=f"{practice_session.exercise_name}_progress.json",
             mime="application/json"
         )
 
     # Non-intrusive options
-    if 'current_word_pair' in st.session_state and st.session_state['current_word_pair'] is not None:
+    if practice_session.current_word_pair:
         with st.expander("Options"):
             col1, col2, col3 = st.columns(3)
             with col1:
                 if st.button('Change Assessment'):
-                    change_assessment(cookies)
+                    change_assessment(practice_session, cookies)
             with col2:
                 if st.button('Remove this question'):
-                    remove_current_question(cookies)
+                    remove_current_question(practice_session, cookies)
             with col3:
                 if st.button("Pronounce Answer"):
-                    pronounce_answer()
+                    pronounce_answer(practice_session)
 
-def change_assessment(cookies):
+def change_assessment(practice_session, cookies):
     # Reverse the 'correct' value
-    st.session_state['progress'][-1]['correct'] = not st.session_state['progress'][-1]['correct']
+    practice_session.progress[-1]['correct'] = not practice_session.progress[-1]['correct']
     # Update mistakes list
-    current_word_pair = st.session_state['current_word_pair']
-    if st.session_state['progress'][-1]['correct']:
-        if current_word_pair in st.session_state['mistakes']:
-            st.session_state['mistakes'].remove(current_word_pair)
-        feedback = f"Corrected to correct. Your answer: **{st.session_state['progress'][-1]['your_answer']}**"
+    current_word_pair = practice_session.current_word_pair
+    if practice_session.progress[-1]['correct']:
+        if current_word_pair in practice_session.mistakes:
+            practice_session.mistakes.remove(current_word_pair)
+        feedback = f"Corrected to correct. Your answer: **{practice_session.progress[-1]['your_answer']}**"
         st.success(feedback)
     else:
-        if current_word_pair not in st.session_state['mistakes']:
-            st.session_state['mistakes'].append(current_word_pair)
-        feedback = f"Corrected to incorrect. Your answer: **{st.session_state['progress'][-1]['your_answer']}**"
+        if current_word_pair not in practice_session.mistakes:
+            practice_session.mistakes.append(current_word_pair)
+        feedback = f"Corrected to incorrect. Your answer: **{practice_session.progress[-1]['your_answer']}**"
         st.error(feedback)
-    # Save progress data to session_state and cookies
-    save_progress_data(cookies)
+    # Save progress data
+    practice_session.save_progress_data(cookies)
 
-def remove_current_question(cookies):
-    current_index = st.session_state['current_index']
-    current_word_pair = st.session_state['current_word_pair']
+def remove_current_question(practice_session, cookies):
+    current_index = practice_session.current_index
+    current_word_pair = practice_session.current_word_pair
     # Remove the current word pair
-    st.session_state['word_list'].pop(current_index - 1)
-    if current_word_pair in st.session_state['mistakes']:
-        st.session_state['mistakes'].remove(current_word_pair)
+    practice_session.word_list.pop(current_index - 1)
+    if current_word_pair in practice_session.mistakes:
+        practice_session.mistakes.remove(current_word_pair)
     # Remove the last progress entry
-    st.session_state['progress'].pop()
+    practice_session.progress.pop()
     # Adjust total_words since the word_list has changed
-    total_words = len(st.session_state['word_list'])
+    total_words = len(practice_session.word_list)
     if current_index - 1 >= total_words:
         st.write("You have completed all words in this exercise!")
         st.stop()
-    # Save progress data to session_state and cookies
-    save_progress_data(cookies)
+    # Save progress data
+    practice_session.save_progress_data(cookies)
     st.success('Question removed from test set.')
 
-def pronounce_answer():
-    if 'pronounce_answer_text' in st.session_state:
+def pronounce_answer(practice_session):
+    if practice_session.pronounce_answer_text:
         answer_audio_html = tts_audio(
-            st.session_state['pronounce_answer_text'],
-            st.session_state['pronounce_answer_lang']
+            practice_session.pronounce_answer_text,
+            practice_session.pronounce_answer_lang
         )
         st.markdown(answer_audio_html, unsafe_allow_html=True)
     else:
