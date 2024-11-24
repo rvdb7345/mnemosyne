@@ -18,7 +18,9 @@ class PracticeSession:
     source_language: str = 'Source'
     target_language: str = 'Target'
     direction_options: list = field(default_factory=list)
+    original_word_list: list = field(default_factory=list)
     word_list: list = field(default_factory=list)
+    mistakes_word_list: list = field(default_factory=list)
     current_index: int = 0
     mistakes: list = field(default_factory=list)
     progress: list = field(default_factory=list)
@@ -56,19 +58,32 @@ class PracticeSession:
             del progress_data[direction_key]
         self.progress_data = progress_data
 
+    def create_word_list(self):
+         self.original_word_list = self.exercise_df.to_dict('records')
+
     def load_progress(self):
         """Load progress for the current direction."""
+
+        if not self.original_word_list:
+            self.create_word_list() 
+
         direction_key = self.direction.replace(" ", "_").lower()
         progress_data = self.progress_data or {}
         if direction_key in progress_data:
             direction_progress = progress_data[direction_key]
-            self.word_list = direction_progress['word_list']
+            # **For practice mode, set word_list to original_word_list**
+            if self.current_mode == 'practice':
+                self.word_list = self.original_word_list.copy()
+                random.shuffle(self.word_list)
+            elif self.current_mode == 'mistakes':
+                self.mistakes_word_list = self.mistakes.copy()
+                random.shuffle(self.mistakes_word_list)
             self.current_index = direction_progress['current_index']
             self.mistakes = direction_progress['mistakes']
             self.progress = direction_progress['progress']
-            self.pronounce_answer_trigger = False
+            # Reset other fields...
             self.practice_started = True
-            self.last_feedback_message = None  # Reset feedback message
+            self.last_feedback_message = None
             self.loaded_progress_practice = True
         else:
             # Initialize for the new direction
@@ -79,7 +94,7 @@ class PracticeSession:
         progress_data = self.progress_data or {}
         direction_key = self.direction.replace(" ", "_").lower()
         progress_data[direction_key] = {
-            'word_list': self.word_list,
+            # **Do not save word_list to avoid overwriting**
             'current_index': self.current_index,
             'mistakes': self.mistakes,
             'progress': self.progress,
@@ -116,10 +131,11 @@ class PracticeSession:
 
     def practice_mistakes(self):
         """Set up the session to practice mistakes."""
-        self.word_list = self.mistakes.copy()
-        random.shuffle(self.word_list)
+        if not self.original_word_list:
+            self.create_word_list() 
+
         self.current_index = 0
-        self.mistakes = []
+        # Do not clear self.mistakes here
         self.progress = []
         self.last_feedback_message = None
         self.clear_input = True

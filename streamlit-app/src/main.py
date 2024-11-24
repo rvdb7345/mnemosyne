@@ -5,11 +5,15 @@ import json
 st.set_page_config(page_title="Vocabulary Practice App", layout="wide")
 
 
+
 from utils.helpers import create_dir
 from utils.file_paths import add_project_to_path, ProjectPaths
 from streamlit_cookies_manager import EncryptedCookieManager
 from sections.practice_session import PracticeSession
 from sections import practice, mistakes
+
+pp = ProjectPaths()
+add_project_to_path(pp)
 
 
 # Initialize cookie manager
@@ -21,8 +25,6 @@ cookies = EncryptedCookieManager(
 if not cookies.ready():
     st.stop()
 
-pp = ProjectPaths()
-add_project_to_path(pp)
 
 # Initialize base directory
 EXERCISES_DIR = 'exercises'
