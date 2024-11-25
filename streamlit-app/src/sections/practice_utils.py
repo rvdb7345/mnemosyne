@@ -154,10 +154,8 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
     # Option to download progress
     if st.button("Generate Downloadable Progress"):
         # Save current progress data
-        practice_session.save_progress_data(cookies)
-        # Prepare progress data
-        progress_data = practice_session.progress_practice if mode == 'practice' else practice_session.progress_mistakes
-        progress_json = json.dumps(progress_data)
+        progress_json = practice_session.save_progress_data(cookies)
+        
         # Create a download button
         st.download_button(
             label="Download Progress",

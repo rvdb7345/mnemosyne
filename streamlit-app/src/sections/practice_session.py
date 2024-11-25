@@ -170,6 +170,8 @@ class PracticeSession:
         progress_json = json.dumps(progress_data)
         if cookies:
             cookies['progress_data'] = progress_json
+        
+        return progress_json
     
     def update_progress_practice(self, direction, question, user_input, answer, correct, current_word_pair):
         """Update the progress after an answer is submitted in practice mode."""
