@@ -144,9 +144,9 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
     reset_label = "Reset Progress" if mode == 'practice' else "Reset Mistakes Progress"
     if st.button(reset_label):
         if mode == 'practice':
-            practice_session.reset_practice_progress()
+            practice_session.reset_practice_progress(direction)
         else:
-            practice_session.reset_mistakes_progress()
+            practice_session.reset_mistakes_progress(direction)
         practice_session.save_progress_data(cookies)
         st.success(f"{reset_label} has been reset.")
         st.rerun()
@@ -155,7 +155,7 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
     if st.button("Generate Downloadable Progress"):
         # Save current progress data
         progress_json = practice_session.save_progress_data(cookies)
-        
+
         # Create a download button
         st.download_button(
             label="Download Progress",
