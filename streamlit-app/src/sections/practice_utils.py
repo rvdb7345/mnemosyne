@@ -165,18 +165,17 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
         )
 
     # Non-intrusive options
-    if getattr(practice_session, f'current_word_pair_{mode}', None):
-        with st.expander("Options"):
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                if st.button('Change Assessment'):
-                    change_assessment(practice_session, cookies, mode=mode)
-            with col2:
-                if st.button('Remove this question'):
-                    remove_current_question(practice_session, cookies, mode=mode)
-            with col3:
-                if st.button("Pronounce Answer"):
-                    pronounce_answer(practice_session) 
+    with st.expander("Options"):
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button('Change Assessment'):
+                change_assessment(practice_session, cookies, mode=mode, direction=direction)
+        with col2:
+            if st.button('Remove this question'):
+                remove_current_question(practice_session, cookies, mode=mode, direction=direction)
+        with col3:
+            if st.button("Pronounce Answer"):
+                pronounce_answer(practice_session) 
 
 def change_assessment(practice_session: PracticeSession, cookies, mode='practice', direction='Source to Target'):
     """

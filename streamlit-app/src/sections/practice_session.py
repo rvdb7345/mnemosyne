@@ -24,7 +24,7 @@ class PracticeSession:
     exercise_name: str = ''
     exercise_df: pd.DataFrame = None
     original_word_list: list = field(default_factory=list)
-    mistakes: list = field(default_factory=list)
+    mistakes: dict = field(default_factory=dict)
     
     # Direction-specific Practice Sets
     practice_sets: dict = field(default_factory=dict)
@@ -62,9 +62,11 @@ class PracticeSession:
             )
             random.shuffle(self.practice_sets[direction].word_list)
             
+            self.mistakes[direction] = []
+
             # Initialize Mistakes Set
             self.mistakes_sets[direction] = PracticeSet(
-                word_list=self.mistakes.copy(),
+                word_list=self.mistakes[direction].copy(),
                 progress=[],
                 current_index=0,
                 last_feedback_message=None,
@@ -84,7 +86,7 @@ class PracticeSession:
         self.ignore_accents = progress_data.get('ignore_accents', False)
         self.exercise_df = pd.DataFrame(progress_data.get('exercise_data', []))
         self.original_word_list = self.exercise_df.to_dict('records')
-        self.mistakes = progress_data.get('mistakes', [])
+        self.mistakes = progress_data.get('mistakes', {})
         
         # Define both directions
         directions = [
@@ -107,7 +109,7 @@ class PracticeSession:
             # Load Mistakes Set
             mistakes_data = progress_data.get('mistakes_sets', {}).get(direction, {})
             self.mistakes_sets[direction] = PracticeSet(
-                word_list=mistakes_data.get('word_list', self.mistakes.copy()),
+                word_list=mistakes_data.get('word_list', self.mistakes[direction].copy()),
                 progress=mistakes_data.get('progress', []),
                 current_index=mistakes_data.get('current_index', 0),
                 last_feedback_message=mistakes_data.get('last_feedback_message', None),
@@ -128,7 +130,7 @@ class PracticeSession:
     def reset_mistakes_progress(self, direction):
         """Reset the progress for the specified mistakes direction."""
         if direction in self.mistakes_sets:
-            self.mistakes_sets[direction].word_list = self.mistakes.copy()
+            self.mistakes_sets[direction].word_list = self.mistakes[direction].copy()
             random.shuffle(self.mistakes_sets[direction].word_list)
             self.mistakes_sets[direction].progress = []
             self.mistakes_sets[direction].current_index = 0
@@ -203,8 +205,8 @@ class PracticeSession:
     
     def add_mistake(self, word_pair, direction):
         """Add a word pair to the mistakes list for the specified direction."""
-        if word_pair not in self.mistakes:
-            self.mistakes.append(word_pair)
+        if word_pair not in self.mistakes[direction]:
+            self.mistakes[direction].append(word_pair)
             if direction in self.mistakes_sets:
                 self.mistakes_sets[direction].word_list.append(word_pair)
                 random.shuffle(self.mistakes_sets[direction].word_list)
