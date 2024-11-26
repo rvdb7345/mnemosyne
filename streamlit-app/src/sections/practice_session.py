@@ -146,7 +146,10 @@ class PracticeSession:
             'tolerance': self.tolerance,
             'ignore_accents': self.ignore_accents,
             'exercise_data': self.exercise_df.to_dict('records'),
-            'mistakes': self.mistakes,
+            'mistakes': {
+                direction: set
+                for direction, set in self.mistakes.items()
+            },
             'practice_sets': {
                 direction: {
                     'word_list': set.word_list,

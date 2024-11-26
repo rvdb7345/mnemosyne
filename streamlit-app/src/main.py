@@ -3,6 +3,7 @@
 import streamlit as st
 import pandas as pd
 import json
+import traceback
 import random
 
 # Import the standard_exercise_definition module to ensure all subclasses are loaded
@@ -127,7 +128,7 @@ def upload_progress(practice_session, cookies):
         except json.JSONDecodeError:
             st.error("Failed to decode progress file. Please upload a valid JSON file.")
         except Exception as e:
-            st.error(f"An error occurred while uploading progress: {e}")
+            st.error(f"An error occurred while uploading progress: {e}: \n {traceback.format_exc()}")
 
 def start_new_exercise(practice_session, cookies):
     st.write("Upload a new exercise file (CSV or TXT).")
@@ -201,7 +202,7 @@ def start_new_exercise(practice_session, cookies):
                 st.session_state['page'] = 'Practice'
                 st.rerun()
             except Exception as e:
-                st.error(f"Error uploading exercise: {e}")
+                st.error(f"Error uploading exercise: {e} \n {traceback.format_exc()}")
         else:
             st.error("Please provide both a file and a custom exercise name.")
 

@@ -104,7 +104,7 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
                 st.success(feedback)
                 if mode == 'practice':
                     # Remove from mistakes if previously marked as mistake
-                    practice_session.mistakes = [wp for wp in practice_session.mistakes if wp != current_word_pair]
+                    practice_session.mistakes[direction] = [wp for wp in practice_session.mistakes[direction] if wp != current_word_pair]
                     practice_session.mistakes_sets[direction].word_list = [wp for wp in practice_session.mistakes_sets[direction].word_list if wp != current_word_pair]
             else:
                 feedback = f"Incorrect! Your answer: **{user_input}**. Acceptable answers were: **{', '.join(acceptable_answers)}**"
@@ -210,8 +210,8 @@ def change_assessment(practice_session: PracticeSession, cookies, mode='practice
         st.success(feedback)
         if mode == 'practice':
             # Remove from mistakes if present
-            if last_entry['word_pair'] in practice_session.mistakes:
-                practice_session.mistakes.remove(last_entry['word_pair'])
+            if last_entry['word_pair'] in practice_session.mistakes[direction]:
+                practice_session.mistakes[direction].remove(last_entry['word_pair'])
             if last_entry['word_pair'] in practice_session.mistakes_sets[direction].word_list:
                 practice_session.mistakes_sets[direction].word_list.remove(last_entry['word_pair'])
     else:
@@ -219,8 +219,8 @@ def change_assessment(practice_session: PracticeSession, cookies, mode='practice
         practice_set.last_feedback_message = ('error', feedback)
         st.error(feedback)
         if mode == 'practice':
-            if last_entry['word_pair'] not in practice_session.mistakes:
-                practice_session.mistakes.append(last_entry['word_pair'])
+            if last_entry['word_pair'] not in practice_session.mistakes[direction]:
+                practice_session.mistakes[direction].append(last_entry['word_pair'])
             if last_entry['word_pair'] not in practice_session.mistakes_sets[direction].word_list:
                 practice_session.mistakes_sets[direction].word_list.append(last_entry['word_pair'])
                 random.shuffle(practice_session.mistakes_sets[direction].word_list)
@@ -255,8 +255,8 @@ def remove_current_question(practice_session: PracticeSession, cookies, mode='pr
 
     if mode == 'practice':
         # Also remove from mistakes if present
-        if current_word_pair in practice_session.mistakes:
-            practice_session.mistakes.remove(current_word_pair)
+        if current_word_pair in practice_session.mistakes[direction]:
+            practice_session.mistakes[direction].remove(current_word_pair)
         if current_word_pair in practice_session.mistakes_sets[direction].word_list:
             practice_session.mistakes_sets[direction].word_list.remove(current_word_pair)
 
