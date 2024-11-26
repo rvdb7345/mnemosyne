@@ -1,3 +1,5 @@
+# src/sections/practice_session.py
+
 from dataclasses import dataclass, field
 from datetime import datetime
 import random
@@ -5,127 +7,209 @@ import json
 import pandas as pd
 
 @dataclass
-class PracticeSession:
-    # Fields
+class PracticeSet:
+    word_list: list = field(default_factory=list)
+    progress: list = field(default_factory=list)
+    current_index: int = 0
+    last_feedback_message: tuple = None
     practice_started: bool = False
-    progress_data: dict = field(default_factory=dict)
-    direction: str = ''
-    direction_radio: str = ''
+
+@dataclass
+class PracticeSession:
+    # General Settings
     tolerance: int = 80
     ignore_accents: bool = False
-    exercise_df: pd.DataFrame = None
-    exercise_name: str = ''
     source_language: str = 'Source'
     target_language: str = 'Target'
-    direction_options: list = field(default_factory=list)
-    word_list: list = field(default_factory=list)
-    current_index: int = 0
-    mistakes: list = field(default_factory=list)
-    progress: list = field(default_factory=list)
+    exercise_name: str = ''
+    exercise_df: pd.DataFrame = None
+    original_word_list: list = field(default_factory=list)
+    mistakes: dict = field(default_factory=dict)
+    
+    # Direction-specific Practice Sets
+    practice_sets: dict = field(default_factory=dict)
+    mistakes_sets: dict = field(default_factory=dict)
+    
+    # Pronunciation Fields
     pronounce_answer_trigger: bool = False
     pronounce_answer_text: str = ''
     pronounce_answer_lang: str = ''
-    current_word_pair: dict = field(default_factory=dict)
-    clear_input: bool = False
-    last_feedback_message: tuple = None  # Feedback message to display
-    current_mode: str = 'practice'  # 'practice' or 'mistakes'
-    loaded_progress_practice: bool = False  # Indicates if progress has been loaded
+    
+    def setup_new_exercise(self, df, source_language, target_language, exercise_name):
+        """Setup a new exercise with provided DataFrame and language settings."""
+        self.exercise_df = df
+        self.source_language = source_language
+        self.target_language = target_language
+        self.exercise_name = exercise_name
+        self.original_word_list = self.exercise_df.to_dict('records')
+        self.practice_sets = {}
+        self.mistakes_sets = {}
 
-    # Methods
-    def initialize_base_settings(self):
-        """Initialize or reset the base settings for the practice session."""
-        self.word_list = self.exercise_df.to_dict('records')
-        random.shuffle(self.word_list)
-        self.current_index = 0
-        self.mistakes = []
-        self.progress = []
-        self.pronounce_answer_trigger = False
-        self.pronounce_answer_text = ''
-        self.pronounce_answer_lang = ''
-        self.current_word_pair = {}
-        self.clear_input = True
-        self.last_feedback_message = None  # Reset feedback message
+        # Define both directions
+        directions = [
+            f"{self.source_language} to {self.target_language}",
+            f"{self.target_language} to {self.source_language}"
+        ]
+        
+        for direction in directions:
+            # Initialize Practice Set
+            self.practice_sets[direction] = PracticeSet(
+                word_list=self.original_word_list.copy(),
+                progress=[],
+                current_index=0,
+                last_feedback_message=None,
+                practice_started=False
+            )
+            random.shuffle(self.practice_sets[direction].word_list)
+            
+            self.mistakes[direction] = []
 
-    def reset_progress(self):
-        """Reset the progress for the current direction."""
-        self.initialize_base_settings()
-        # Remove progress data for current direction
-        direction_key = self.direction.replace(" ", "_").lower()
-        progress_data = self.progress_data or {}
-        if direction_key in progress_data:
-            del progress_data[direction_key]
-        self.progress_data = progress_data
-
-    def load_progress(self):
-        """Load progress for the current direction."""
-        direction_key = self.direction.replace(" ", "_").lower()
-        progress_data = self.progress_data or {}
-        if direction_key in progress_data:
-            direction_progress = progress_data[direction_key]
-            self.word_list = direction_progress['word_list']
-            self.current_index = direction_progress['current_index']
-            self.mistakes = direction_progress['mistakes']
-            self.progress = direction_progress['progress']
-            self.pronounce_answer_trigger = False
-            self.practice_started = True
-            self.last_feedback_message = None  # Reset feedback message
-            self.loaded_progress_practice = True
-        else:
-            # Initialize for the new direction
-            self.initialize_base_settings()
-
+            # Initialize Mistakes Set
+            self.mistakes_sets[direction] = PracticeSet(
+                word_list=self.mistakes[direction].copy(),
+                progress=[],
+                current_index=0,
+                last_feedback_message=None,
+                practice_started=False
+            )
+            random.shuffle(self.mistakes_sets[direction].word_list)
+        
+        # Save initial progress data
+        self.save_progress_data(cookies=None)  # Pass None if not saving immediately
+    
+    def load_from_progress(self, progress_data):
+        """Load session data from progress data."""
+        self.source_language = progress_data.get('source_language', 'Source')
+        self.target_language = progress_data.get('target_language', 'Target')
+        self.exercise_name = progress_data.get('exercise_name', 'Exercise')
+        self.tolerance = progress_data.get('tolerance', 80)
+        self.ignore_accents = progress_data.get('ignore_accents', False)
+        self.exercise_df = pd.DataFrame(progress_data.get('exercise_data', []))
+        self.original_word_list = self.exercise_df.to_dict('records')
+        self.mistakes = progress_data.get('mistakes', {})
+        
+        # Define both directions
+        directions = [
+            f"{self.source_language} to {self.target_language}",
+            f"{self.target_language} to {self.source_language}"
+        ]
+        
+        for direction in directions:
+            # Load Practice Set
+            practice_data = progress_data.get('practice_sets', {}).get(direction, {})
+            self.practice_sets[direction] = PracticeSet(
+                word_list=practice_data.get('word_list', self.original_word_list.copy()),
+                progress=practice_data.get('progress', []),
+                current_index=practice_data.get('current_index', 0),
+                last_feedback_message=practice_data.get('last_feedback_message', None),
+                practice_started=practice_data.get('practice_started', False)
+            )
+            random.shuffle(self.practice_sets[direction].word_list)
+            
+            # Load Mistakes Set
+            mistakes_data = progress_data.get('mistakes_sets', {}).get(direction, {})
+            self.mistakes_sets[direction] = PracticeSet(
+                word_list=mistakes_data.get('word_list', self.mistakes[direction].copy()),
+                progress=mistakes_data.get('progress', []),
+                current_index=mistakes_data.get('current_index', 0),
+                last_feedback_message=mistakes_data.get('last_feedback_message', None),
+                practice_started=mistakes_data.get('practice_started', False)
+            )
+            random.shuffle(self.mistakes_sets[direction].word_list)
+    
+    def reset_practice_progress(self, direction):
+        """Reset the progress for the specified practice direction."""
+        if direction in self.practice_sets:
+            self.practice_sets[direction].word_list = self.original_word_list.copy()
+            random.shuffle(self.practice_sets[direction].word_list)
+            self.practice_sets[direction].progress = []
+            self.practice_sets[direction].current_index = 0
+            self.practice_sets[direction].last_feedback_message = None
+            self.practice_sets[direction].practice_started = False
+    
+    def reset_mistakes_progress(self, direction):
+        """Reset the progress for the specified mistakes direction."""
+        if direction in self.mistakes_sets:
+            self.mistakes_sets[direction].word_list = self.mistakes[direction].copy()
+            random.shuffle(self.mistakes_sets[direction].word_list)
+            self.mistakes_sets[direction].progress = []
+            self.mistakes_sets[direction].current_index = 0
+            self.mistakes_sets[direction].last_feedback_message = None
+            self.mistakes_sets[direction].practice_started = False
+    
     def save_progress_data(self, cookies):
         """Save progress data to the session and cookies."""
-        progress_data = self.progress_data or {}
-        direction_key = self.direction.replace(" ", "_").lower()
-        progress_data[direction_key] = {
-            'word_list': self.word_list,
-            'current_index': self.current_index,
-            'mistakes': self.mistakes,
-            'progress': self.progress,
+        progress_data = {
+            'source_language': self.source_language,
+            'target_language': self.target_language,
+            'exercise_name': self.exercise_name,
+            'tolerance': self.tolerance,
+            'ignore_accents': self.ignore_accents,
+            'exercise_data': self.exercise_df.to_dict('records'),
+            'mistakes': {
+                direction: set
+                for direction, set in self.mistakes.items()
+            },
+            'practice_sets': {
+                direction: {
+                    'word_list': set.word_list,
+                    'progress': set.progress,
+                    'current_index': set.current_index,
+                    'last_feedback_message': set.last_feedback_message,
+                    'practice_started': set.practice_started
+                }
+                for direction, set in self.practice_sets.items()
+            },
+            'mistakes_sets': {
+                direction: {
+                    'word_list':set.word_list,
+                    'progress': set.progress,
+                    'current_index': set.current_index,
+                    'last_feedback_message': set.last_feedback_message,
+                    'practice_started': set.practice_started
+                }
+                for direction, set in self.mistakes_sets.items()
+            }
         }
-        # Include additional session state data
-        progress_data['source_language'] = self.source_language
-        progress_data['target_language'] = self.target_language
-        progress_data['exercise_name'] = self.exercise_name
-        progress_data['tolerance'] = self.tolerance
-        progress_data['ignore_accents'] = self.ignore_accents
-
-        # Save the exercise_df data
-        progress_data['exercise_data'] = self.exercise_df.to_dict('records')
-
-        # Save progress data to practice_session for downloading
-        self.progress_data = progress_data
+    
         progress_json = json.dumps(progress_data)
-        # Save progress data to cookies
-        cookies['progress_data'] = progress_json
-
-
-    def update_progress(self, question, user_input, answer, correct, current_word_pair):
-        """Update the progress after an answer is submitted."""
-        self.progress.append({
-            'question': question,
-            'your_answer': user_input,
-            'correct_answer': answer,
-            'correct': correct,
-            'timestamp': datetime.now().isoformat(),
-            'word_pair': current_word_pair
-        })
-        self.current_index += 1
-        self.clear_input = True
-
-    def practice_mistakes(self):
-        """Set up the session to practice mistakes."""
-        self.word_list = self.mistakes.copy()
-        random.shuffle(self.word_list)
-        self.current_index = 0
-        self.mistakes = []
-        self.progress = []
-        self.last_feedback_message = None
-        self.clear_input = True
-        self.current_word_pair = None
-        self.pronounce_answer_trigger = False
-        self.pronounce_answer_text = ''
-        self.pronounce_answer_lang = ''
-        self.practice_started = True
-        self.current_mode = 'mistakes'  # Update mode
+        if cookies:
+            cookies['progress_data'] = progress_json
+        
+        return progress_json
+    
+    def update_progress_practice(self, direction, question, user_input, answer, correct, current_word_pair):
+        """Update the progress after an answer is submitted in practice mode."""
+        practice_set = self.practice_sets.get(direction)
+        if practice_set:
+            practice_set.progress.append({
+                'question': question,
+                'your_answer': user_input,
+                'correct_answer': answer,
+                'correct': correct,
+                'timestamp': datetime.now().isoformat(),
+                'word_pair': current_word_pair
+            })
+            practice_set.current_index += 1
+    
+    def update_progress_mistakes(self, direction, question, user_input, answer, correct, current_word_pair):
+        """Update the progress after an answer is submitted in mistakes mode."""
+        mistakes_set = self.mistakes_sets.get(direction)
+        if mistakes_set:
+            mistakes_set.progress.append({
+                'question': question,
+                'your_answer': user_input,
+                'correct_answer': answer,
+                'correct': correct,
+                'timestamp': datetime.now().isoformat(),
+                'word_pair': current_word_pair
+            })
+            mistakes_set.current_index += 1
+    
+    def add_mistake(self, word_pair, direction):
+        """Add a word pair to the mistakes list for the specified direction."""
+        if word_pair not in self.mistakes[direction]:
+            self.mistakes[direction].append(word_pair)
+            if direction in self.mistakes_sets:
+                self.mistakes_sets[direction].word_list.append(word_pair)
+                random.shuffle(self.mistakes_sets[direction].word_list)

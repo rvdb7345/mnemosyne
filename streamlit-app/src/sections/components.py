@@ -1,3 +1,5 @@
+# src/sections/components.py
+
 import streamlit as st
 
 def render_flashcard(content):
