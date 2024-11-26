@@ -15,4 +15,5 @@ bcrypt = "^4.2.0"
 streamlit-cookies-controller = "^0.0.4"
 streamlit-authenticator = "^0.4.1"
 streamlit-cookies-manager = "^0.2.0"
+openai = "^1.55.1"
 
