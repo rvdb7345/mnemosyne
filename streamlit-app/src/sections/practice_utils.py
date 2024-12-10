@@ -127,7 +127,7 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
                 practice_session.update_progress_mistakes(direction, question, user_input, answer, correct, current_word_pair)
 
             # Save progress data
-            practice_session.save_progress_data(cookies)
+            practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
 
             # Clear the user input
             setattr(practice_session, f'clear_input_{mode}', True)
@@ -147,14 +147,14 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
             practice_session.reset_practice_progress(direction)
         else:
             practice_session.reset_mistakes_progress(direction)
-        practice_session.save_progress_data(cookies)
+        practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
         st.success(f"{reset_label} has been reset.")
         st.rerun()
 
     # Option to download progress
     if st.button("Generate Downloadable Progress"):
         # Save current progress data
-        progress_json = practice_session.save_progress_data(cookies)
+        progress_json = practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
 
         # Create a download button
         st.download_button(
@@ -226,7 +226,8 @@ def change_assessment(practice_session: PracticeSession, cookies, mode='practice
                 random.shuffle(practice_session.mistakes_sets[direction].word_list)
 
     # Save the updated progress data
-    practice_session.save_progress_data(cookies)
+    practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
+
 
         
 def remove_current_question(practice_session: PracticeSession, cookies, mode='practice', direction='Source to Target'):
@@ -261,7 +262,7 @@ def remove_current_question(practice_session: PracticeSession, cookies, mode='pr
             practice_session.mistakes_sets[direction].word_list.remove(current_word_pair)
 
     # Save progress data
-    practice_session.save_progress_data(cookies)
+    practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
     st.success('Question removed from test set.')
 
 

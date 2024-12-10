@@ -5,6 +5,7 @@ from datetime import datetime
 import random
 import json
 import pandas as pd
+import os
 
 @dataclass
 class PracticeSet:
@@ -74,8 +75,8 @@ class PracticeSession:
             )
             random.shuffle(self.mistakes_sets[direction].word_list)
         
-        # Save initial progress data
-        self.save_progress_data(cookies=None)  # Pass None if not saving immediately
+        # Initially save progress data (if you want to do so)
+        self.save_progress_data(cookies=None)
     
     def load_from_progress(self, progress_data):
         """Load session data from progress data."""
@@ -109,7 +110,7 @@ class PracticeSession:
             # Load Mistakes Set
             mistakes_data = progress_data.get('mistakes_sets', {}).get(direction, {})
             self.mistakes_sets[direction] = PracticeSet(
-                word_list=mistakes_data.get('word_list', self.mistakes[direction].copy()),
+                word_list=mistakes_data.get('word_list', self.mistakes.get(direction, []).copy()),
                 progress=mistakes_data.get('progress', []),
                 current_index=mistakes_data.get('current_index', 0),
                 last_feedback_message=mistakes_data.get('last_feedback_message', None),
@@ -137,44 +138,54 @@ class PracticeSession:
             self.mistakes_sets[direction].last_feedback_message = None
             self.mistakes_sets[direction].practice_started = False
     
-    def save_progress_data(self, cookies):
-        """Save progress data to the session and cookies."""
+    def save_progress_data(self, cookies, drive_manager=None, user_folder_id=None):
+        """Save progress data to the session and cookies, and optionally to Google Drive."""
         progress_data = {
             'source_language': self.source_language,
             'target_language': self.target_language,
             'exercise_name': self.exercise_name,
             'tolerance': self.tolerance,
             'ignore_accents': self.ignore_accents,
-            'exercise_data': self.exercise_df.to_dict('records'),
-            'mistakes': {
-                direction: set
-                for direction, set in self.mistakes.items()
-            },
+            'exercise_data': self.exercise_df.to_dict('records') if self.exercise_df is not None else [],
+            'mistakes': self.mistakes,
             'practice_sets': {
                 direction: {
-                    'word_list': set.word_list,
-                    'progress': set.progress,
-                    'current_index': set.current_index,
-                    'last_feedback_message': set.last_feedback_message,
-                    'practice_started': set.practice_started
+                    'word_list': pset.word_list,
+                    'progress': pset.progress,
+                    'current_index': pset.current_index,
+                    'last_feedback_message': pset.last_feedback_message,
+                    'practice_started': pset.practice_started
                 }
-                for direction, set in self.practice_sets.items()
+                for direction, pset in self.practice_sets.items()
             },
             'mistakes_sets': {
                 direction: {
-                    'word_list':set.word_list,
-                    'progress': set.progress,
-                    'current_index': set.current_index,
-                    'last_feedback_message': set.last_feedback_message,
-                    'practice_started': set.practice_started
+                    'word_list': mset.word_list,
+                    'progress': mset.progress,
+                    'current_index': mset.current_index,
+                    'last_feedback_message': mset.last_feedback_message,
+                    'practice_started': mset.practice_started
                 }
-                for direction, set in self.mistakes_sets.items()
+                for direction, mset in self.mistakes_sets.items()
             }
         }
     
         progress_json = json.dumps(progress_data)
         if cookies:
             cookies['progress_data'] = progress_json
+        
+        # Save progress data to Google Drive if drive_manager and user_folder_id are provided
+        if drive_manager and user_folder_id:
+            filename = f"{self.exercise_name}_progress.json"
+            os.makedirs("temp_progress", exist_ok=True)
+            local_path = os.path.join("temp_progress", filename)
+            with open(local_path, "w") as f:
+                f.write(progress_json)
+            
+            # Upload file to the user's folder on Drive
+            # If a file with the same name exists, it might create duplicates. 
+            # Consider using drive_manager.get_file_id_by_name() to delete or overwrite.
+            drive_manager.upload_file_to_directory(local_path, user_folder_id, mime_type='application/json')
         
         return progress_json
     
