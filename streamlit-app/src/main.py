@@ -75,6 +75,9 @@ def main():
     # Initialize Google Drive Manager
     # Make sure your environment has GDRIVE_CREDENTIALS and MAIN_PROGRESS_FOLDER_ID set
     drive_manager = GoogleDriveManager()
+    if 'drive_manager' not in st.session_state:
+        st.session_state['drive_manager'] = GoogleDriveManager()
+
     main_progress_folder_id = os.environ.get('MAIN_PROGRESS_FOLDER_ID', None)
     if not main_progress_folder_id:
         st.error("MAIN_PROGRESS_FOLDER_ID not set in environment.")
@@ -143,7 +146,7 @@ def show_main_page(practice_session, cookies, drive_manager):
 
                 # Navigate to Practice page
                 st.session_state['page'] = 'Practice'
-                st.experimental_rerun()
+                st.rerun()
 
     elif choice == "Upload Progress":
         upload_progress(practice_session, cookies)
@@ -160,7 +163,7 @@ def load_progress(practice_session, cookies):
         practice_session.load_from_progress(progress_data)
         # Navigate to Practice page
         st.session_state['page'] = 'Practice'
-        st.experimental_rerun()
+        st.rerun()
     else:
         st.error("No progress data found in cookies.")
 
@@ -178,7 +181,7 @@ def upload_progress(practice_session, cookies):
 
             # Navigate to Practice page
             st.session_state['page'] = 'Practice'
-            st.experimental_rerun()
+            st.rerun()
         except json.JSONDecodeError:
             st.error("Failed to decode progress file. Please upload a valid JSON file.")
         except Exception as e:
@@ -254,7 +257,7 @@ def start_new_exercise(practice_session, cookies):
 
                 # Navigate to Practice page
                 st.session_state['page'] = 'Practice'
-                st.experimental_rerun()
+                st.rerun()
             except Exception as e:
                 st.error(f"Error uploading exercise: {e} \n {traceback.format_exc()}")
         else:
@@ -290,7 +293,7 @@ def select_predefined_exercise(practice_session, cookies):
 
         # Navigate to Practice page
         st.session_state['page'] = 'Practice'
-        st.experimental_rerun()
+        st.rerun()
 
 def get_or_create_user_folder(drive_manager, main_folder_id, username):
     # Check if folder with username already exists in main_folder_id

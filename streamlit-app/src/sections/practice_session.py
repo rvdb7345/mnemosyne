@@ -139,7 +139,7 @@ class PracticeSession:
             self.mistakes_sets[direction].practice_started = False
     
     def save_progress_data(self, cookies, drive_manager=None, user_folder_id=None):
-        """Save progress data to the session and cookies, and optionally to Google Drive."""
+        """Save progress data to the session, cookies, and optionally overwrite on Google Drive."""
         progress_data = {
             'source_language': self.source_language,
             'target_language': self.target_language,
@@ -169,11 +169,11 @@ class PracticeSession:
                 for direction, mset in self.mistakes_sets.items()
             }
         }
-    
+
         progress_json = json.dumps(progress_data)
         if cookies:
             cookies['progress_data'] = progress_json
-        
+
         # Save progress data to Google Drive if drive_manager and user_folder_id are provided
         if drive_manager and user_folder_id:
             filename = f"{self.exercise_name}_progress.json"
@@ -181,13 +181,25 @@ class PracticeSession:
             local_path = os.path.join("temp_progress", filename)
             with open(local_path, "w") as f:
                 f.write(progress_json)
-            
-            # Upload file to the user's folder on Drive
-            # If a file with the same name exists, it might create duplicates. 
-            # Consider using drive_manager.get_file_id_by_name() to delete or overwrite.
-            drive_manager.upload_file_to_directory(local_path, user_folder_id, mime_type='application/json')
-        
+
+            # Check if file already exists
+            existing_file_id = drive_manager.get_file_id_by_name(user_folder_id, filename)
+
+            if existing_file_id:
+                # Update the existing file
+                from googleapiclient.http import MediaFileUpload
+                media = MediaFileUpload(local_path, mimetype='application/json', resumable=True)
+                drive_manager.service.files().update(
+                    fileId=existing_file_id,
+                    media_body=media,
+                    fields='id'
+                ).execute()
+            else:
+                # Create a new file if it doesn't exist
+                drive_manager.upload_file_to_directory(local_path, user_folder_id, mime_type='application/json')
+
         return progress_json
+
     
     def update_progress_practice(self, direction, question, user_input, answer, correct, current_word_pair):
         """Update the progress after an answer is submitted in practice mode."""
