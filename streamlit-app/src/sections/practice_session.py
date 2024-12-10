@@ -6,6 +6,8 @@ import random
 import json
 import pandas as pd
 import os
+import concurrent.futures
+from googleapiclient.http import MediaFileUpload
 
 @dataclass
 class PracticeSet:
@@ -17,6 +19,9 @@ class PracticeSet:
 
 @dataclass
 class PracticeSession:
+    # Class-level executor for background tasks
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+
     # General Settings
     tolerance: int = 80
     ignore_accents: bool = False
@@ -35,7 +40,7 @@ class PracticeSession:
     pronounce_answer_trigger: bool = False
     pronounce_answer_text: str = ''
     pronounce_answer_lang: str = ''
-    
+
     def setup_new_exercise(self, df, source_language, target_language, exercise_name):
         """Setup a new exercise with provided DataFrame and language settings."""
         self.exercise_df = df
@@ -77,7 +82,7 @@ class PracticeSession:
         
         # Initially save progress data (if you want to do so)
         self.save_progress_data(cookies=None)
-    
+
     def load_from_progress(self, progress_data):
         """Load session data from progress data."""
         self.source_language = progress_data.get('source_language', 'Source')
@@ -117,7 +122,7 @@ class PracticeSession:
                 practice_started=mistakes_data.get('practice_started', False)
             )
             random.shuffle(self.mistakes_sets[direction].word_list)
-    
+
     def reset_practice_progress(self, direction):
         """Reset the progress for the specified practice direction."""
         if direction in self.practice_sets:
@@ -127,7 +132,7 @@ class PracticeSession:
             self.practice_sets[direction].current_index = 0
             self.practice_sets[direction].last_feedback_message = None
             self.practice_sets[direction].practice_started = False
-    
+
     def reset_mistakes_progress(self, direction):
         """Reset the progress for the specified mistakes direction."""
         if direction in self.mistakes_sets:
@@ -137,9 +142,26 @@ class PracticeSession:
             self.mistakes_sets[direction].current_index = 0
             self.mistakes_sets[direction].last_feedback_message = None
             self.mistakes_sets[direction].practice_started = False
-    
-    def save_progress_data(self, cookies, drive_manager=None, user_folder_id=None):
-        """Save progress data to the session, cookies, and optionally overwrite on Google Drive."""
+
+    def _upload_in_background(self, drive_manager, user_folder_id, local_path):
+        """Handle the file update/upload in the background."""
+        filename = os.path.basename(local_path)
+        existing_file_id = drive_manager.get_file_id_by_name(user_folder_id, filename)
+        media = MediaFileUpload(local_path, mimetype='application/json', resumable=True)
+
+        if existing_file_id:
+            # Update the existing file
+            drive_manager.service.files().update(
+                fileId=existing_file_id,
+                media_body=media,
+                fields='id'
+            ).execute()
+        else:
+            # Create a new file if it doesn't exist
+            drive_manager.upload_file_to_directory(local_path, user_folder_id, mime_type='application/json')
+
+    def save_progress_data(self, cookies, drive_manager=None, user_folder_id=None, async_save=False):
+        """Save progress data to the session, cookies, and optionally overwrite on Google Drive asynchronously."""
         progress_data = {
             'source_language': self.source_language,
             'target_language': self.target_language,
@@ -182,25 +204,16 @@ class PracticeSession:
             with open(local_path, "w") as f:
                 f.write(progress_json)
 
-            # Check if file already exists
-            existing_file_id = drive_manager.get_file_id_by_name(user_folder_id, filename)
-
-            if existing_file_id:
-                # Update the existing file
-                from googleapiclient.http import MediaFileUpload
-                media = MediaFileUpload(local_path, mimetype='application/json', resumable=True)
-                drive_manager.service.files().update(
-                    fileId=existing_file_id,
-                    media_body=media,
-                    fields='id'
-                ).execute()
+            if async_save:
+                # Submit the upload to the executor to run in the background
+                future = self.executor.submit(self._upload_in_background, drive_manager, user_folder_id, local_path)
+                # Optionally, you could store 'future' in session state or return it for tracking
             else:
-                # Create a new file if it doesn't exist
-                drive_manager.upload_file_to_directory(local_path, user_folder_id, mime_type='application/json')
+                # Synchronous update
+                self._upload_in_background(drive_manager, user_folder_id, local_path)
 
         return progress_json
 
-    
     def update_progress_practice(self, direction, question, user_input, answer, correct, current_word_pair):
         """Update the progress after an answer is submitted in practice mode."""
         practice_set = self.practice_sets.get(direction)
@@ -214,7 +227,7 @@ class PracticeSession:
                 'word_pair': current_word_pair
             })
             practice_set.current_index += 1
-    
+
     def update_progress_mistakes(self, direction, question, user_input, answer, correct, current_word_pair):
         """Update the progress after an answer is submitted in mistakes mode."""
         mistakes_set = self.mistakes_sets.get(direction)
@@ -228,7 +241,7 @@ class PracticeSession:
                 'word_pair': current_word_pair
             })
             mistakes_set.current_index += 1
-    
+
     def add_mistake(self, word_pair, direction):
         """Add a word pair to the mistakes list for the specified direction."""
         if word_pair not in self.mistakes[direction]:
