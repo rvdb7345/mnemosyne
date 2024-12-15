@@ -7,6 +7,9 @@ import traceback
 import random
 import openai  # Added import for OpenAI API
 
+from pydantic import BaseModel
+from typing import List
+
 # Import the standard_exercise_definition module to ensure all subclasses are loaded
 import standard_exercises.standard_exercise_definition
 from standard_exercises.standard_exercise_definition import VocabList
@@ -62,6 +65,18 @@ PREDEFINED_EXERCISES = {
     for vocab_class in VocabList.__subclasses__()
 }
 
+# Define Pydantic models for Structured Outputs
+
+class WordExtractionResponse(BaseModel):
+    words: List[str]
+
+class TranslationItem(BaseModel):
+    original: str
+    translation: str
+
+class TranslationResponse(BaseModel):
+    translations: List[TranslationItem]
+
 def initialize_practice_session():
     if 'practice_session' not in st.session_state:
         st.session_state['practice_session'] = PracticeSession()
@@ -70,20 +85,16 @@ def main():
     initialize_practice_session()
     practice_session = st.session_state['practice_session']
 
-    # Sidebar navigation
-    st.sidebar.title("Navigation")
-
     # User enters username
     username = st.text_input("Enter your username", key='user_name_input')
     st.session_state['username'] = username.strip()
 
     # Initialize Google Drive Manager
-    # Make sure your environment has GDRIVE_CREDENTIALS and MAIN_PROGRESS_FOLDER_ID set
     drive_manager = GoogleDriveManager()
     if 'drive_manager' not in st.session_state:
         st.session_state['drive_manager'] = GoogleDriveManager()
 
-    main_progress_folder_id =  st.secrets['other_variables']["MAIN_PROGRESS_FOLDER_ID"]
+    main_progress_folder_id = st.secrets['other_variables']["MAIN_PROGRESS_FOLDER_ID"]
     if not main_progress_folder_id:
         st.error("MAIN_PROGRESS_FOLDER_ID not set in environment.")
         return
@@ -94,12 +105,26 @@ def main():
         user_folder_id = get_or_create_user_folder(drive_manager, main_progress_folder_id, username)
         st.session_state['user_folder_id'] = user_folder_id
 
-    # Prepare main menu options
-    options = ["Main Menu", "Practice", "Mistakes", "Create Word List from Story"]
-
+    # Initialize the 'page' state if not already set
     if 'page' not in st.session_state:
         st.session_state['page'] = 'Main Menu'
-    st.session_state['page'] = st.sidebar.radio("Go to", options, index=options.index(st.session_state['page']))
+
+    # Sidebar navigation
+    st.sidebar.title("Navigation")
+    sidebar_options = ["Main Menu", "Practice", "Mistakes"]
+
+    # Sidebar radio selection
+    selected_sidebar = st.sidebar.radio(
+        "Go to",
+        sidebar_options,
+        index=sidebar_options.index(st.session_state['page']) if st.session_state['page'] in sidebar_options else 0,
+        key='sidebar_radio'
+    )
+
+    # Update 'page' based on sidebar selection only if it's different
+    if selected_sidebar != st.session_state['page']:
+        st.session_state['page'] = selected_sidebar
+        st.rerun()
 
     # Main Page Navigation
     if st.session_state['page'] == 'Main Menu':
@@ -108,27 +133,21 @@ def main():
         practice.show_practice(practice_session, cookies, mode='practice')
     elif st.session_state['page'] == 'Mistakes':
         practice.show_practice(practice_session, cookies, mode='mistakes')
-    elif st.session_state['page'] == 'Create Word List from Story':  # Handle new page
-        create_word_list_from_story()
 
 def show_main_page(practice_session, cookies, drive_manager):
     st.title("Vocabulary Practice App")
     st.write("Please select an option:")
 
-    # Default options
-    options = ["Upload Progress", "Start New Exercise", "Select a Predefined Exercise"]
-
     username = st.session_state.get('username', '').strip()
     user_folder_id = st.session_state.get('user_folder_id', None)
 
-    # If we have a username and corresponding folder on Drive
-    # Check if there are any progress files for this user
+    # Default options
+    options = ["Upload Progress", "Start New Exercise", "Select a Predefined Exercise", "Create Word List from Story"]
+
+    # If we have existing progress files, add "Continue where you left off"
     if username and user_folder_id:
         progress_files = drive_manager.list_files_in_directory(user_folder_id)
-        # Filter to .json files that might represent progress files
         progress_json_files = [f for f in progress_files if f['name'].endswith('.json')]
-
-        # If progress files exist, add "Continue where you left off" as an option
         if progress_json_files:
             options = ["Continue where you left off"] + options
 
@@ -136,15 +155,10 @@ def show_main_page(practice_session, cookies, drive_manager):
 
     if choice == "Continue where you left off":
         # Let user choose from their existing progress files on Drive
-        selected_file = st.selectbox("Select progress file to continue", [f['name'] for f in progress_json_files])
+        selected_file = st.selectbox("Select progress file to continue", [f['name'] for f in progress_json_files], key='select_progress_file')
         if st.button("Load Progress", key='load_progress_button'):
             # Download the selected file from Drive
-            file_id = None
-            for f in progress_json_files:
-                if f['name'] == selected_file:
-                    file_id = f['id']
-                    break
-
+            file_id = next((f['id'] for f in progress_json_files if f['name'] == selected_file), None)
             if file_id:
                 local_download_path = f"temp_downloads/{selected_file}"
                 drive_manager.download_file(file_id, local_download_path)
@@ -158,10 +172,57 @@ def show_main_page(practice_session, cookies, drive_manager):
 
     elif choice == "Upload Progress":
         upload_progress(practice_session, cookies)
+
     elif choice == "Start New Exercise":
         start_new_exercise(practice_session, cookies)
+
     elif choice == "Select a Predefined Exercise":
         select_predefined_exercise(practice_session, cookies)
+
+    elif choice == "Create Word List from Story":
+        create_word_list_from_story()
+
+    # After handling main options, check if a word list has been generated
+    if 'generated_word_list' in st.session_state:
+        st.markdown("---")
+        st.subheader("Generated Word List Options")
+
+        # Option 1: Download is already handled within create_word_list_from_story()
+
+        # Option 2: Practice the generated word list
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Practice This Word List", key='practice_word_list_button'):
+                df_exercise = st.session_state['generated_word_list'].rename(columns={
+                    "Original Word": st.session_state['word_list_source_language'],
+                    f"Translation ({st.session_state['word_list_target_language']})": st.session_state['word_list_target_language']
+                })
+
+                # Setup the exercise in the practice_session
+                practice_session.setup_new_exercise(
+                    df=df_exercise,
+                    source_language=st.session_state['word_list_source_language'],
+                    target_language=st.session_state['word_list_target_language'],
+                    exercise_name=f"{st.session_state['story_name']}"
+                )
+
+                # Save progress
+                practice_session.save_progress_data(
+                    cookies, 
+                    drive_manager=st.session_state['drive_manager'], 
+                    user_folder_id=st.session_state['user_folder_id']
+                )
+
+                # Navigate to Practice page
+                st.session_state['page'] = 'Practice'
+                st.rerun()
+        with col2:
+            if st.button("Clear Word List", key='clear_word_list_button'):
+                del st.session_state['generated_word_list']
+                del st.session_state['word_list_source_language']
+                del st.session_state['word_list_target_language']
+                del st.session_state['story_name']
+                st.success("Word list cleared.")
 
 def load_progress(practice_session, cookies):
     progress_content = cookies.get('progress_data')
@@ -304,11 +365,13 @@ def select_predefined_exercise(practice_session, cookies):
         st.rerun()
 
 def create_word_list_from_story():
-    st.title("Create Word List from Story")
+    st.subheader("Create Word List from Story")
     st.write("Paste your story below and generate a word list with translations.")
 
     # Input fields
     story = st.text_area("Enter your story here:", height=300)
+    story_name = st.text_input("Enter the name of your story here:", key='story_name_input')
+
     source_language_name = st.selectbox(
         "Source Language",
         list(LANGUAGE_OPTIONS.keys()),
@@ -323,16 +386,29 @@ def create_word_list_from_story():
     )
     api_key = st.text_input("Enter your OpenAI API Key:", type="password")
 
-    if st.button("Generate Word List"):
+    if st.button("Generate Word List", key='generate_word_list_button'):
         if not story.strip():
             st.error("Please enter a story.")
+            return
+        if not story_name.strip():
+            st.error("Please enter a name for your story.")
             return
         if not api_key.strip():
             st.error("Please enter your OpenAI API key.")
             return
 
+        # Clear any existing word list
+        if 'generated_word_list' in st.session_state:
+            del st.session_state['generated_word_list']
+            del st.session_state['word_list_source_language']
+            del st.session_state['word_list_target_language']
+            del st.session_state['story_name']
+
         # Set OpenAI API key
         openai.api_key = api_key.strip()
+
+        # Store story name in session state
+        st.session_state['story_name'] = story_name.strip()
 
         # Process the story
         with st.spinner('Generating word list and translations...'):
@@ -345,6 +421,11 @@ def create_word_list_from_story():
                     # Create a DataFrame with original and translated words
                     df_translated = pd.DataFrame(translated_words, columns=["Original Word", f"Translation ({target_language_name})"])
 
+                    # Store the DataFrame and language names in session state
+                    st.session_state['generated_word_list'] = df_translated
+                    st.session_state['word_list_source_language'] = source_language_name
+                    st.session_state['word_list_target_language'] = target_language_name
+
                     # Display the word list with translations
                     st.success("Word list with translations generated successfully!")
                     st.dataframe(df_translated)
@@ -354,13 +435,16 @@ def create_word_list_from_story():
                     st.download_button(
                         label="Download Word List as CSV",
                         data=csv,
-                        file_name='word_list_with_translations.csv',
+                        file_name=f'word_list_{story_name.strip().replace(" ", "_")}.csv',
                         mime='text/csv',
+                        key='download_word_list_button'
                     )
                 else:
                     st.warning("No words were extracted from the story.")
             except Exception as e:
                 st.error(f"An error occurred: {e}\n{traceback.format_exc()}")
+
+    # No buttons here. Buttons are handled in show_main_page()
 
 def split_text_into_chunks(text, max_tokens=1000):
     """
@@ -396,7 +480,7 @@ def get_tokenizer():
 
 def generate_word_list_from_story(story, source_language):
     """
-    Generates a word list from the provided story using OpenAI API.
+    Generates a word list from the provided story using OpenAI API with Structured Outputs.
 
     Args:
         story (str): The story text.
@@ -413,21 +497,41 @@ def generate_word_list_from_story(story, source_language):
     for idx, chunk in enumerate(chunks):
         st.write(f"Processing chunk {idx + 1} of {len(chunks)}...")
         prompt = (
-            f"Extract all unique words from the following {source_language} text in their dictionary form (unconjugated, no suffixes), including phrasal verbs:\n\n{chunk}\n\n"
-            "List the words as a comma-separated list."
+            f"Extract all unique words from the following {source_language} text in their dictionary form "
+            f"(unconjugated, no suffixes), including phrasal verbs.\n\n{chunk}\n\n"
+            "Provide the output as a JSON object adhering to the following schema:\n"
+            "{\n"
+            "  \"words\": [\n"
+            "    \"word1\",\n"
+            "    \"word2\",\n"
+            "    \"word3\"\n"
+            "  ]\n"
+            "}"
         )
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant that extracts unique words from a text."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.0,
-            max_tokens=1500,
-        )
-        words_text = response['choices'][0]['message']['content']
-        words = [word.strip() for word in words_text.replace('\n', '').split(',') if word.strip()]
-        unique_words.update(words)
+
+        try:
+            response = openai.beta.chat.completions.parse(
+                model="gpt-4o-2024-08-06",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": prompt}
+                ],
+                response_format=WordExtractionResponse,
+                temperature=0.0,
+                max_tokens=1500,
+            )
+        except openai.error.OpenAIError as e:
+            st.error(f"OpenAI API error during word extraction: {e}")
+            st.stop()
+
+        # Check for refusal
+        if hasattr(response.choices[0].message, 'refusal') and response.choices[0].message.refusal:
+            st.error(f"Refusal from OpenAI API: {response.choices[0].message.refusal}")
+            continue
+
+        # Extract words
+        extracted_words = response.choices[0].message.parsed.words
+        unique_words.update(extracted_words)
 
     # Convert set to sorted list
     sorted_words = sorted(unique_words, key=lambda x: x.lower())
@@ -435,7 +539,7 @@ def generate_word_list_from_story(story, source_language):
 
 def translate_words(word_list, source_language, target_language):
     """
-    Translates a list of words from source_language to target_language using OpenAI API.
+    Translates a list of words from source_language to target_language using OpenAI API with Structured Outputs.
 
     Args:
         word_list (List[str]): The list of words to translate.
@@ -447,51 +551,54 @@ def translate_words(word_list, source_language, target_language):
     """
     translated = []
     batch_size = 50  # Adjust based on API limits and performance
+    total_words = len(word_list)
+
     for i in range(0, len(word_list), batch_size):
         batch = word_list[i:i + batch_size]
-        st.write(f"Translating words {i + 1} to {i + len(batch)} of {len(word_list)}...")
+        st.write(f"Translating words {i + 1} to {i + len(batch)} of {total_words}...")
         prompt = (
-            f"Translate the following {source_language} words to {target_language}. "
-            "Provide the output as a JSON array where each item has 'original' and 'translation' fields.\n\n"
-            "Words:\n" + ", ".join(batch)
+            f"Translate the following {source_language} words to {target_language}.\n\n"
+            f"Provide the output as a JSON object adhering to the following schema:\n"
+            "{\n"
+            "  \"translations\": [\n"
+            "    {\n"
+            "      \"original\": \"word1\",\n"
+            "      \"translation\": \"translated_word1\"\n"
+            "    },\n"
+            "    {\n"
+            "      \"original\": \"word2\",\n"
+            "      \"translation\": \"translated_word2\"\n"
+            "    }\n"
+            "  ]\n"
+            "}"
         )
+
         try:
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
+            response = openai.beta.chat.completions.parse(
+                model="gpt-4o-2024-08-06",
                 messages=[
-                    {"role": "system", "content": "You are a helpful assistant that translates words."},
-                    {"role": "user", "content": prompt}
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": prompt + "\n\nWords:\n" + ", ".join(batch)}
                 ],
+                response_format=TranslationResponse,
                 temperature=0.0,
                 max_tokens=3000,
             )
-            response_text = response['choices'][0]['message']['content']
-
-            # Attempt to parse JSON
-            try:
-                translations = json.loads(response_text)
-                for item in translations:
-                    original = item.get('original', '').strip()
-                    translation = item.get('translation', '').strip()
-                    if original and translation:
-                        translated.append((original, translation))
-            except json.JSONDecodeError:
-                # Fallback: Parse manually if JSON parsing fails
-                st.warning("Failed to parse translation response as JSON. Attempting manual parsing.")
-                lines = response_text.strip().split('\n')
-                for line in lines:
-                    if ':' in line:
-                        parts = line.split(':', 1)
-                        original = parts[0].strip().strip('"').strip("'")
-                        translation = parts[1].strip().strip('"').strip("'")
-                        if original and translation:
-                            translated.append((original, translation))
-        except Exception as e:
-            st.error(f"An error occurred during translation: {e}")
+        except openai.error.OpenAIError as e:
+            st.error(f"OpenAI API error during translation: {e}")
             st.stop()
 
-    return translated
+        # Check for refusal
+        if hasattr(response.choices[0].message, 'refusal') and response.choices[0].message.refusal:
+            st.error(f"Refusal from OpenAI API: {response.choices[0].message.refusal}")
+            continue
 
+        # Extract translations
+        translations = response.choices[0].message.parsed.translations
+        for item in translations:
+            translated.append((item.original, item.translation))
+
+    return translated
 
 def get_or_create_user_folder(drive_manager, main_folder_id, username):
     # Check if folder with username already exists in main_folder_id
@@ -505,4 +612,4 @@ def get_or_create_user_folder(drive_manager, main_folder_id, username):
     return user_folder_id
 
 if __name__ == "__main__":
-        main()
+    main()
