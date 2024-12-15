@@ -1,6 +1,7 @@
 import os
 import json
 import io
+import streamlit as st
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from google.oauth2.service_account import Credentials
@@ -15,15 +16,17 @@ class GoogleDriveManager:
         if scopes is None:
             scopes = ['https://www.googleapis.com/auth/drive']
         
-        # Load service account credentials from environment variable
-        credentials_data = os.environ.get(credentials_env_var)
+        try:
+            # Load service account credentials from environment variable (locally)
+            credentials_data = os.environ.get(credentials_env_var)
+            service_account_info = json.loads(credentials_data)
 
-        print(credentials_data)
-        if not credentials_data:
-            raise ValueError(f"Environment variable {credentials_env_var} not set or empty.")
+            if not credentials_data:
+                raise ValueError(f"Environment variable {credentials_env_var} not set or empty.")
+        except ValueError as e:
+            service_account_info = st.secrets["gdrive_credentials"]
         
-        service_account_info = json.loads(credentials_data)
-        print(service_account_info)
+
         creds = Credentials.from_service_account_info(service_account_info, scopes=scopes)
         
         self.service = build('drive', 'v3', credentials=creds)
