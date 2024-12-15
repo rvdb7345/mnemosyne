@@ -5,6 +5,9 @@ from datetime import datetime
 import random
 import json
 import pandas as pd
+import os
+import concurrent.futures
+from googleapiclient.http import MediaFileUpload
 
 @dataclass
 class PracticeSet:
@@ -16,6 +19,9 @@ class PracticeSet:
 
 @dataclass
 class PracticeSession:
+    # Class-level executor for background tasks
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+
     # General Settings
     tolerance: int = 80
     ignore_accents: bool = False
@@ -34,7 +40,7 @@ class PracticeSession:
     pronounce_answer_trigger: bool = False
     pronounce_answer_text: str = ''
     pronounce_answer_lang: str = ''
-    
+
     def setup_new_exercise(self, df, source_language, target_language, exercise_name):
         """Setup a new exercise with provided DataFrame and language settings."""
         self.exercise_df = df
@@ -74,9 +80,9 @@ class PracticeSession:
             )
             random.shuffle(self.mistakes_sets[direction].word_list)
         
-        # Save initial progress data
-        self.save_progress_data(cookies=None)  # Pass None if not saving immediately
-    
+        # Initially save progress data (if you want to do so)
+        self.save_progress_data(cookies=None)
+
     def load_from_progress(self, progress_data):
         """Load session data from progress data."""
         self.source_language = progress_data.get('source_language', 'Source')
@@ -109,14 +115,14 @@ class PracticeSession:
             # Load Mistakes Set
             mistakes_data = progress_data.get('mistakes_sets', {}).get(direction, {})
             self.mistakes_sets[direction] = PracticeSet(
-                word_list=mistakes_data.get('word_list', self.mistakes[direction].copy()),
+                word_list=mistakes_data.get('word_list', self.mistakes.get(direction, []).copy()),
                 progress=mistakes_data.get('progress', []),
                 current_index=mistakes_data.get('current_index', 0),
                 last_feedback_message=mistakes_data.get('last_feedback_message', None),
                 practice_started=mistakes_data.get('practice_started', False)
             )
             random.shuffle(self.mistakes_sets[direction].word_list)
-    
+
     def reset_practice_progress(self, direction):
         """Reset the progress for the specified practice direction."""
         if direction in self.practice_sets:
@@ -126,7 +132,7 @@ class PracticeSession:
             self.practice_sets[direction].current_index = 0
             self.practice_sets[direction].last_feedback_message = None
             self.practice_sets[direction].practice_started = False
-    
+
     def reset_mistakes_progress(self, direction):
         """Reset the progress for the specified mistakes direction."""
         if direction in self.mistakes_sets:
@@ -136,48 +142,78 @@ class PracticeSession:
             self.mistakes_sets[direction].current_index = 0
             self.mistakes_sets[direction].last_feedback_message = None
             self.mistakes_sets[direction].practice_started = False
-    
-    def save_progress_data(self, cookies):
-        """Save progress data to the session and cookies."""
+
+    def _upload_in_background(self, drive_manager, user_folder_id, local_path):
+        """Handle the file update/upload in the background."""
+        filename = os.path.basename(local_path)
+        existing_file_id = drive_manager.get_file_id_by_name(user_folder_id, filename)
+        media = MediaFileUpload(local_path, mimetype='application/json', resumable=True)
+
+        if existing_file_id:
+            # Update the existing file
+            drive_manager.service.files().update(
+                fileId=existing_file_id,
+                media_body=media,
+                fields='id'
+            ).execute()
+        else:
+            # Create a new file if it doesn't exist
+            drive_manager.upload_file_to_directory(local_path, user_folder_id, mime_type='application/json')
+
+    def save_progress_data(self, cookies, drive_manager=None, user_folder_id=None, async_save=True):
+        """Save progress data to the session, cookies, and optionally overwrite on Google Drive asynchronously."""
         progress_data = {
             'source_language': self.source_language,
             'target_language': self.target_language,
             'exercise_name': self.exercise_name,
             'tolerance': self.tolerance,
             'ignore_accents': self.ignore_accents,
-            'exercise_data': self.exercise_df.to_dict('records'),
-            'mistakes': {
-                direction: set
-                for direction, set in self.mistakes.items()
-            },
+            'exercise_data': self.exercise_df.to_dict('records') if self.exercise_df is not None else [],
+            'mistakes': self.mistakes,
             'practice_sets': {
                 direction: {
-                    'word_list': set.word_list,
-                    'progress': set.progress,
-                    'current_index': set.current_index,
-                    'last_feedback_message': set.last_feedback_message,
-                    'practice_started': set.practice_started
+                    'word_list': pset.word_list,
+                    'progress': pset.progress,
+                    'current_index': pset.current_index,
+                    'last_feedback_message': pset.last_feedback_message,
+                    'practice_started': pset.practice_started
                 }
-                for direction, set in self.practice_sets.items()
+                for direction, pset in self.practice_sets.items()
             },
             'mistakes_sets': {
                 direction: {
-                    'word_list':set.word_list,
-                    'progress': set.progress,
-                    'current_index': set.current_index,
-                    'last_feedback_message': set.last_feedback_message,
-                    'practice_started': set.practice_started
+                    'word_list': mset.word_list,
+                    'progress': mset.progress,
+                    'current_index': mset.current_index,
+                    'last_feedback_message': mset.last_feedback_message,
+                    'practice_started': mset.practice_started
                 }
-                for direction, set in self.mistakes_sets.items()
+                for direction, mset in self.mistakes_sets.items()
             }
         }
-    
+
         progress_json = json.dumps(progress_data)
         if cookies:
             cookies['progress_data'] = progress_json
-        
+
+        # Save progress data to Google Drive if drive_manager and user_folder_id are provided
+        if drive_manager and user_folder_id:
+            filename = f"{self.exercise_name}_progress.json"
+            os.makedirs("temp_progress", exist_ok=True)
+            local_path = os.path.join("temp_progress", filename)
+            with open(local_path, "w") as f:
+                f.write(progress_json)
+
+            if async_save:
+                # Submit the upload to the executor to run in the background
+                future = self.executor.submit(self._upload_in_background, drive_manager, user_folder_id, local_path)
+                # Optionally, you could store 'future' in session state or return it for tracking
+            else:
+                # Synchronous update
+                self._upload_in_background(drive_manager, user_folder_id, local_path)
+
         return progress_json
-    
+
     def update_progress_practice(self, direction, question, user_input, answer, correct, current_word_pair):
         """Update the progress after an answer is submitted in practice mode."""
         practice_set = self.practice_sets.get(direction)
@@ -191,7 +227,7 @@ class PracticeSession:
                 'word_pair': current_word_pair
             })
             practice_set.current_index += 1
-    
+
     def update_progress_mistakes(self, direction, question, user_input, answer, correct, current_word_pair):
         """Update the progress after an answer is submitted in mistakes mode."""
         mistakes_set = self.mistakes_sets.get(direction)
@@ -205,7 +241,7 @@ class PracticeSession:
                 'word_pair': current_word_pair
             })
             mistakes_set.current_index += 1
-    
+
     def add_mistake(self, word_pair, direction):
         """Add a word pair to the mistakes list for the specified direction."""
         if word_pair not in self.mistakes[direction]:

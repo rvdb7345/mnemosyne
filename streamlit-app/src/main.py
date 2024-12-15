@@ -10,6 +10,7 @@ import openai  # Added import for OpenAI API
 # Import the standard_exercise_definition module to ensure all subclasses are loaded
 import standard_exercises.standard_exercise_definition
 from standard_exercises.standard_exercise_definition import VocabList
+import os
 
 from utils.helpers import create_dir
 from utils.file_paths import add_project_to_path, ProjectPaths
@@ -17,6 +18,10 @@ from streamlit_cookies_manager import EncryptedCookieManager
 from sections.practice_session import PracticeSession
 from sections import practice
 from sections import components  # Assuming components might be used in main as well
+from utils.google_drive import GoogleDriveManager
+import dotenv
+
+dotenv.load_dotenv(".env")
 
 # Initialize project paths
 pp = ProjectPaths()
@@ -31,7 +36,7 @@ cookies = EncryptedCookieManager(
 if not cookies.ready():
     st.stop()
 
-# Initialize base directory
+# Initialize base directory (locally)
 EXERCISES_DIR = 'exercises'
 create_dir(EXERCISES_DIR)
 
@@ -50,6 +55,8 @@ LANGUAGE_OPTIONS = {
 }
 
 # Dynamically create the PREDEFINED_EXERCISES mapping from registered subclasses
+import standard_exercises.standard_exercise_definition
+from standard_exercises.standard_exercise_definition import VocabList
 PREDEFINED_EXERCISES = {
     vocab_class().exercise_name: vocab_class
     for vocab_class in VocabList.__subclasses__()
@@ -65,14 +72,38 @@ def main():
 
     # Sidebar navigation
     st.sidebar.title("Navigation")
-    options = ["Main Menu", "Practice", "Mistakes", "Create Word List from Story"]  # Added new option
+
+    # User enters username
+    username = st.text_input("Enter your username", key='user_name_input')
+    st.session_state['username'] = username.strip()
+
+    # Initialize Google Drive Manager
+    # Make sure your environment has GDRIVE_CREDENTIALS and MAIN_PROGRESS_FOLDER_ID set
+    drive_manager = GoogleDriveManager()
+    if 'drive_manager' not in st.session_state:
+        st.session_state['drive_manager'] = GoogleDriveManager()
+
+    main_progress_folder_id =  st.secrets['other_variables']["MAIN_PROGRESS_FOLDER_ID"]
+    if not main_progress_folder_id:
+        st.error("MAIN_PROGRESS_FOLDER_ID not set in environment.")
+        return
+
+    user_folder_id = None
+    if username:
+        # Check if user folder exists
+        user_folder_id = get_or_create_user_folder(drive_manager, main_progress_folder_id, username)
+        st.session_state['user_folder_id'] = user_folder_id
+
+    # Prepare main menu options
+    options = ["Main Menu", "Practice", "Mistakes", "Create Word List from Story"]
+
     if 'page' not in st.session_state:
         st.session_state['page'] = 'Main Menu'
     st.session_state['page'] = st.sidebar.radio("Go to", options, index=options.index(st.session_state['page']))
 
     # Main Page Navigation
     if st.session_state['page'] == 'Main Menu':
-        show_main_page(practice_session, cookies)
+        show_main_page(practice_session, cookies, drive_manager)
     elif st.session_state['page'] == 'Practice':
         practice.show_practice(practice_session, cookies, mode='practice')
     elif st.session_state['page'] == 'Mistakes':
@@ -80,20 +111,51 @@ def main():
     elif st.session_state['page'] == 'Create Word List from Story':  # Handle new page
         create_word_list_from_story()
 
-def show_main_page(practice_session, cookies):
+def show_main_page(practice_session, cookies, drive_manager):
     st.title("Vocabulary Practice App")
     st.write("Please select an option:")
 
+    # Default options
     options = ["Upload Progress", "Start New Exercise", "Select a Predefined Exercise"]
 
-    # Check if progress data is in cookies
-    if cookies.get('progress_data'):
-        options += ["Continue where you left off"]
+    username = st.session_state.get('username', '').strip()
+    user_folder_id = st.session_state.get('user_folder_id', None)
+
+    # If we have a username and corresponding folder on Drive
+    # Check if there are any progress files for this user
+    if username and user_folder_id:
+        progress_files = drive_manager.list_files_in_directory(user_folder_id)
+        # Filter to .json files that might represent progress files
+        progress_json_files = [f for f in progress_files if f['name'].endswith('.json')]
+
+        # If progress files exist, add "Continue where you left off" as an option
+        if progress_json_files:
+            options = ["Continue where you left off"] + options
 
     choice = st.selectbox("Select an option", options, key='main_choice_selectbox')
 
     if choice == "Continue where you left off":
-        load_progress(practice_session, cookies)
+        # Let user choose from their existing progress files on Drive
+        selected_file = st.selectbox("Select progress file to continue", [f['name'] for f in progress_json_files])
+        if st.button("Load Progress", key='load_progress_button'):
+            # Download the selected file from Drive
+            file_id = None
+            for f in progress_json_files:
+                if f['name'] == selected_file:
+                    file_id = f['id']
+                    break
+
+            if file_id:
+                local_download_path = f"temp_downloads/{selected_file}"
+                drive_manager.download_file(file_id, local_download_path)
+                with open(local_download_path, 'r') as f:
+                    progress_data = json.load(f)
+                practice_session.load_from_progress(progress_data)
+
+                # Navigate to Practice page
+                st.session_state['page'] = 'Practice'
+                st.rerun()
+
     elif choice == "Upload Progress":
         upload_progress(practice_session, cookies)
     elif choice == "Start New Exercise":
@@ -123,7 +185,7 @@ def upload_progress(practice_session, cookies):
             practice_session.load_from_progress(progress_data)
 
             # Save progress data back to cookies
-            practice_session.save_progress_data(cookies)
+            practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
 
             # Navigate to Practice page
             st.session_state['page'] = 'Practice'
@@ -199,7 +261,7 @@ def start_new_exercise(practice_session, cookies):
                 )
 
                 # Save progress data
-                practice_session.save_progress_data(cookies)
+                practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
 
                 # Navigate to Practice page
                 st.session_state['page'] = 'Practice'
@@ -235,7 +297,7 @@ def select_predefined_exercise(practice_session, cookies):
         )
 
         # Save progress data
-        practice_session.save_progress_data(cookies)
+        practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
 
         # Navigate to Practice page
         st.session_state['page'] = 'Practice'
@@ -429,6 +491,18 @@ def translate_words(word_list, source_language, target_language):
             st.stop()
 
     return translated
+
+
+def get_or_create_user_folder(drive_manager, main_folder_id, username):
+    # Check if folder with username already exists in main_folder_id
+    files = drive_manager.list_files_in_directory(main_folder_id)
+    for f in files:
+        if f['name'] == username and f['mimeType'] == 'application/vnd.google-apps.folder':
+            return f['id']
+
+    # If not found, create a new folder for this user
+    user_folder_id = drive_manager.create_directory(username, parent_folder_id=main_folder_id)
+    return user_folder_id
 
 if __name__ == "__main__":
         main()
