@@ -5,6 +5,14 @@ import pandas as pd
 import json
 import traceback
 import random
+import openai  # Added import for OpenAI API
+
+from pydantic import BaseModel
+from typing import List
+
+# Import the standard_exercise_definition module to ensure all subclasses are loaded
+import standard_exercises.standard_exercise_definition
+from standard_exercises.standard_exercise_definition import VocabList
 import os
 
 from utils.helpers import create_dir
@@ -14,6 +22,7 @@ from sections.practice_session import PracticeSession
 from sections import practice
 from sections import components  # Assuming components might be used in main as well
 from utils.google_drive import GoogleDriveManager
+from utils.story_translation import create_word_list_from_story
 import dotenv
 
 dotenv.load_dotenv(".env")
@@ -57,6 +66,7 @@ PREDEFINED_EXERCISES = {
     for vocab_class in VocabList.__subclasses__()
 }
 
+
 def initialize_practice_session():
     if 'practice_session' not in st.session_state:
         st.session_state['practice_session'] = PracticeSession()
@@ -65,20 +75,16 @@ def main():
     initialize_practice_session()
     practice_session = st.session_state['practice_session']
 
-    # Sidebar navigation
-    st.sidebar.title("Navigation")
-
     # User enters username
     username = st.text_input("Enter your username", key='user_name_input')
     st.session_state['username'] = username.strip()
 
     # Initialize Google Drive Manager
-    # Make sure your environment has GDRIVE_CREDENTIALS and MAIN_PROGRESS_FOLDER_ID set
     drive_manager = GoogleDriveManager()
     if 'drive_manager' not in st.session_state:
         st.session_state['drive_manager'] = GoogleDriveManager()
 
-    main_progress_folder_id =  st.secrets['other_variables']["MAIN_PROGRESS_FOLDER_ID"]
+    main_progress_folder_id = st.secrets['other_variables']["MAIN_PROGRESS_FOLDER_ID"]
     if not main_progress_folder_id:
         st.error("MAIN_PROGRESS_FOLDER_ID not set in environment.")
         return
@@ -89,11 +95,26 @@ def main():
         user_folder_id = get_or_create_user_folder(drive_manager, main_progress_folder_id, username)
         st.session_state['user_folder_id'] = user_folder_id
 
-    # Prepare main menu options
-    options = ["Main Menu", "Practice", "Mistakes"]
+    # Initialize the 'page' state if not already set
     if 'page' not in st.session_state:
         st.session_state['page'] = 'Main Menu'
-    st.session_state['page'] = st.sidebar.radio("Go to", options, index=options.index(st.session_state['page']))
+
+    # Sidebar navigation
+    st.sidebar.title("Navigation")
+    sidebar_options = ["Main Menu", "Practice", "Mistakes"]
+
+    # Sidebar radio selection
+    selected_sidebar = st.sidebar.radio(
+        "Go to",
+        sidebar_options,
+        index=sidebar_options.index(st.session_state['page']) if st.session_state['page'] in sidebar_options else 0,
+        key='sidebar_radio'
+    )
+
+    # Update 'page' based on sidebar selection only if it's different
+    if selected_sidebar != st.session_state['page']:
+        st.session_state['page'] = selected_sidebar
+        st.rerun()
 
     # Main Page Navigation
     if st.session_state['page'] == 'Main Menu':
@@ -107,20 +128,16 @@ def show_main_page(practice_session, cookies, drive_manager):
     st.title("Vocabulary Practice App")
     st.write("Please select an option:")
 
-    # Default options
-    options = ["Upload Progress", "Start New Exercise", "Select a Predefined Exercise"]
-
     username = st.session_state.get('username', '').strip()
     user_folder_id = st.session_state.get('user_folder_id', None)
 
-    # If we have a username and corresponding folder on Drive
-    # Check if there are any progress files for this user
+    # Default options
+    options = ["Upload Progress", "Start New Exercise", "Select a Predefined Exercise", "Create Word List from Story"]
+
+    # If we have existing progress files, add "Continue where you left off"
     if username and user_folder_id:
         progress_files = drive_manager.list_files_in_directory(user_folder_id)
-        # Filter to .json files that might represent progress files
         progress_json_files = [f for f in progress_files if f['name'].endswith('.json')]
-
-        # If progress files exist, add "Continue where you left off" as an option
         if progress_json_files:
             options = ["Continue where you left off"] + options
 
@@ -128,15 +145,10 @@ def show_main_page(practice_session, cookies, drive_manager):
 
     if choice == "Continue where you left off":
         # Let user choose from their existing progress files on Drive
-        selected_file = st.selectbox("Select progress file to continue", [f['name'] for f in progress_json_files])
+        selected_file = st.selectbox("Select progress file to continue", [f['name'] for f in progress_json_files], key='select_progress_file')
         if st.button("Load Progress", key='load_progress_button'):
             # Download the selected file from Drive
-            file_id = None
-            for f in progress_json_files:
-                if f['name'] == selected_file:
-                    file_id = f['id']
-                    break
-
+            file_id = next((f['id'] for f in progress_json_files if f['name'] == selected_file), None)
             if file_id:
                 local_download_path = f"temp_downloads/{selected_file}"
                 drive_manager.download_file(file_id, local_download_path)
@@ -150,10 +162,57 @@ def show_main_page(practice_session, cookies, drive_manager):
 
     elif choice == "Upload Progress":
         upload_progress(practice_session, cookies)
+
     elif choice == "Start New Exercise":
         start_new_exercise(practice_session, cookies)
+
     elif choice == "Select a Predefined Exercise":
         select_predefined_exercise(practice_session, cookies)
+
+    elif choice == "Create Word List from Story":
+        create_word_list_from_story()
+
+    # After handling main options, check if a word list has been generated
+    if 'generated_word_list' in st.session_state:
+        st.markdown("---")
+        st.subheader("Generated Word List Options")
+
+        # Option 1: Download is already handled within create_word_list_from_story()
+
+        # Option 2: Practice the generated word list
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Practice This Word List", key='practice_word_list_button'):
+                df_exercise = st.session_state['generated_word_list'].rename(columns={
+                    "Original Word": st.session_state['word_list_source_language'],
+                    f"Translation ({st.session_state['word_list_target_language']})": st.session_state['word_list_target_language']
+                })
+
+                # Setup the exercise in the practice_session
+                practice_session.setup_new_exercise(
+                    df=df_exercise,
+                    source_language=st.session_state['word_list_source_language'],
+                    target_language=st.session_state['word_list_target_language'],
+                    exercise_name=f"{st.session_state['story_name']}"
+                )
+
+                # Save progress
+                practice_session.save_progress_data(
+                    cookies, 
+                    drive_manager=st.session_state['drive_manager'], 
+                    user_folder_id=st.session_state['user_folder_id']
+                )
+
+                # Navigate to Practice page
+                st.session_state['page'] = 'Practice'
+                st.rerun()
+        with col2:
+            if st.button("Clear Word List", key='clear_word_list_button'):
+                del st.session_state['generated_word_list']
+                del st.session_state['word_list_source_language']
+                del st.session_state['word_list_target_language']
+                del st.session_state['story_name']
+                st.success("Word list cleared.")
 
 def load_progress(practice_session, cookies):
     progress_content = cookies.get('progress_data')
@@ -294,6 +353,8 @@ def select_predefined_exercise(practice_session, cookies):
         # Navigate to Practice page
         st.session_state['page'] = 'Practice'
         st.rerun()
+
+
 
 def get_or_create_user_folder(drive_manager, main_folder_id, username):
     # Check if folder with username already exists in main_folder_id
