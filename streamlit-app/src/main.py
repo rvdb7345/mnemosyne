@@ -78,7 +78,7 @@ def main():
     if 'drive_manager' not in st.session_state:
         st.session_state['drive_manager'] = GoogleDriveManager()
 
-    main_progress_folder_id = os.environ.get('MAIN_PROGRESS_FOLDER_ID', None)
+    main_progress_folder_id =  st.secrets['other_variables']["MAIN_PROGRESS_FOLDER_ID"]
     if not main_progress_folder_id:
         st.error("MAIN_PROGRESS_FOLDER_ID not set in environment.")
         return
@@ -122,7 +122,7 @@ def show_main_page(practice_session, cookies, drive_manager):
 
         # If progress files exist, add "Continue where you left off" as an option
         if progress_json_files:
-            options += ["Continue where you left off"]
+            options = ["Continue where you left off"] + options
 
     choice = st.selectbox("Select an option", options, key='main_choice_selectbox')
 

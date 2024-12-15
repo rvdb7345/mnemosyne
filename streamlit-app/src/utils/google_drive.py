@@ -16,15 +16,10 @@ class GoogleDriveManager:
         if scopes is None:
             scopes = ['https://www.googleapis.com/auth/drive']
         
-        try:
-            # Load service account credentials from environment variable (locally)
-            credentials_data = os.environ.get(credentials_env_var)
-            service_account_info = json.loads(credentials_data)
-
-            if not credentials_data:
-                raise ValueError(f"Environment variable {credentials_env_var} not set or empty.")
-        except ValueError as e:
-            service_account_info = st.secrets["gdrive_credentials"]
+        # Load credentials streamlit toml secrets file
+        service_account_info = st.secrets["gdrive_credentials"]
+        if not service_account_info:
+            raise ValueError(f"Cannot find google drive credentials.")
         
 
         creds = Credentials.from_service_account_info(service_account_info, scopes=scopes)
