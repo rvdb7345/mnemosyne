@@ -160,7 +160,7 @@ class PracticeSession:
             # Create a new file if it doesn't exist
             drive_manager.upload_file_to_directory(local_path, user_folder_id, mime_type='application/json')
 
-    def save_progress_data(self, cookies, drive_manager=None, user_folder_id=None, async_save=False):
+    def save_progress_data(self, cookies, drive_manager=None, user_folder_id=None, async_save=True):
         """Save progress data to the session, cookies, and optionally overwrite on Google Drive asynchronously."""
         progress_data = {
             'source_language': self.source_language,
