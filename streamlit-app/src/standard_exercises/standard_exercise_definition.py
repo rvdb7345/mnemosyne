@@ -33,6 +33,52 @@ class DutchVocabList(VocabList):
             target_language_name='English',
             exercise_path="streamlit-app/src/standard_exercises/DutchEnglishFrequencySimplified.txt"
         )
+        
+class DutchVocabList1000(VocabList):
+    def __init__(self):
+        super().__init__(
+            exercise_name="Dutch Frequency List 0 - 1000",
+            source_language_name='Dutch',
+            target_language_name='English',
+            exercise_path="streamlit-app/src/standard_exercises/DutchEnglishFrequencySimplified1000.txt"
+        )
+        
+class DutchVocabList2000(VocabList):
+    def __init__(self):
+        super().__init__(
+            exercise_name="Dutch Frequency List 1000 - 2000",
+            source_language_name='Dutch',
+            target_language_name='English',
+            exercise_path="streamlit-app/src/standard_exercises/DutchEnglishFrequencySimplified2000.txt"
+        )
+        
+class DutchVocabList3000(VocabList):
+    def __init__(self):
+        super().__init__(
+            exercise_name="Dutch Frequency List 2000 - 3000",
+            source_language_name='Dutch',
+            target_language_name='English',
+            exercise_path="streamlit-app/src/standard_exercises/DutchEnglishFrequencySimplified3000.txt"
+        )
+
+class DutchVocabList4000(VocabList):
+    def __init__(self):
+        super().__init__(
+            exercise_name="Dutch Frequency List 3000 - 4000",
+            source_language_name='Dutch',
+            target_language_name='English',
+            exercise_path="streamlit-app/src/standard_exercises/DutchEnglishFrequencySimplified4000.txt"
+        )
+        
+class DutchVocabList5000(VocabList):
+    def __init__(self):
+        super().__init__(
+            exercise_name="Dutch Frequency List 4000 - 5000",
+            source_language_name='Dutch',
+            target_language_name='English',
+            exercise_path="streamlit-app/src/standard_exercises/DutchEnglishFrequencySimplified5000.txt"
+        )
+
 
 class SpanishVocabList(VocabList):
     def __init__(self):
@@ -41,6 +87,15 @@ class SpanishVocabList(VocabList):
             source_language_name='Spanish',
             target_language_name='English',
             exercise_path="streamlit-app/src/standard_exercises/SpanishEnglishFrequencySimplified.txt"
+        )
+
+class TurkishVocabList(VocabList):
+    def __init__(self):
+        super().__init__(
+            exercise_name="Turkish Duolingo List",
+            source_language_name='Turkish',
+            target_language_name='English',
+            exercise_path="streamlit-app/src/standard_exercises/TurkishEnglishDuolingo.txt"
         )
 
 # Add more predefined VocabList subclasses here as needed
