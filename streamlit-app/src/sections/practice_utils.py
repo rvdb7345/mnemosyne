@@ -1,6 +1,7 @@
 # src/sections/practice_utils.py
 
 import random
+import re
 import streamlit as st
 import json
 from sections.components import render_flashcard, render_feedback
@@ -64,11 +65,6 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
         # Display the word in a flashcard
         render_flashcard(question)
 
-        # Option to hear the pronunciation
-        if st.button("Hear Pronunciation"):
-            audio_html = tts_audio(question, tts_language)
-            st.markdown(audio_html, unsafe_allow_html=True)
-
         # Use a form to allow Enter key submission
         with st.form(key=f'answer_form_{mode}_{direction}', clear_on_submit=True):
             user_input = st.text_input("Your answer:", key='user_input')
@@ -81,17 +77,23 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
             # Get the user's input
             user_input = st.session_state.get('user_input', '')
 
-            # Process the answer
-            acceptable_answers_raw = [ans.strip() for ans in answer.split(',')]
+            # Define a regex pattern to split by commas or option labels (a), b), etc.)
+            split_pattern = re.compile(r',|\s*[a-zA-Z]\)\s*')
+
+            # Split the answer string based on the pattern
+            acceptable_answers_raw = [ans.strip() for ans in split_pattern.split(answer) if ans.strip()]
+            
             acceptable_answers = []
             for ans in acceptable_answers_raw:
                 expanded = expand_parentheses(ans)
                 acceptable_answers.extend(expanded)
+            
+            # Remove duplicates by converting to a set, then back to a list
             acceptable_answers = list(set(acceptable_answers))
             correct = False
             original_correct_answer = None
             for ans in acceptable_answers:
-                is_correct, original_ans = compare_strings(user_input, ans, tolerance, ignore_accents)
+                is_correct, original_ans, exact_match = compare_strings(user_input, ans, tolerance, ignore_accents)
                 if is_correct:
                     correct = True
                     original_correct_answer = original_ans
@@ -99,9 +101,12 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
 
             # Update feedback message
             if correct:
-                feedback = f"Correct! Your answer: **{original_correct_answer}**"
+                if exact_match:
+                    feedback = f"Correct! Your answer: **{user_input}**"
+                else:
+                    feedback = f"Correct! Your answer: **{user_input}**. Exact answer: **{answer}**"
                 practice_set.last_feedback_message = ('success', feedback)
-                st.success(feedback)
+
                 if mode == 'practice':
                     # Remove from mistakes if previously marked as mistake
                     practice_session.mistakes[direction] = [wp for wp in practice_session.mistakes[direction] if wp != current_word_pair]
@@ -109,7 +114,7 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
             else:
                 feedback = f"Incorrect! Your answer: **{user_input}**. Acceptable answers were: **{', '.join(acceptable_answers)}**"
                 practice_set.last_feedback_message = ('error', feedback)
-                st.error(feedback)
+
                 if mode == 'practice':
                     practice_session.add_mistake(current_word_pair, direction)
 
@@ -140,39 +145,48 @@ def practice_logic(practice_session: PracticeSession, cookies, mode='practice', 
         else:
             st.success("🎉 You have completed all mistakes!")
 
-    # Reset progress button
-    reset_label = "Reset Progress" if mode == 'practice' else "Reset Mistakes Progress"
-    if st.button(reset_label):
-        if mode == 'practice':
-            practice_session.reset_practice_progress(direction)
-        else:
-            practice_session.reset_mistakes_progress(direction)
-        practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
-        st.success(f"{reset_label} has been reset.")
-        st.rerun()
 
-    # Option to download progress
-    if st.button("Generate Downloadable Progress"):
-        # Save current progress data
-        progress_json = practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
-
-        # Create a download button
-        st.download_button(
-            label="Download Progress",
-            data=progress_json,
-            file_name=f"{practice_session.exercise_name}_{mode}_progress.json",
-            mime="application/json"
-        )
+    colass, colrem, colpro = st.columns(3)
+    with colass:
+        if st.button('Change Assessment'):
+            change_assessment(practice_session, cookies, mode=mode, direction=direction)
+    with colrem:
+        if st.button('Remove this question'):
+            remove_current_question(practice_session, cookies, mode=mode, direction=direction)
+            # Option to hear the pronunciation
+    with colpro:
+        if st.button("Hear Pronunciation"):
+            audio_html = tts_audio(question, tts_language)
+            st.markdown(audio_html, unsafe_allow_html=True)
 
     # Non-intrusive options
     with st.expander("Options"):
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button('Change Assessment'):
-                change_assessment(practice_session, cookies, mode=mode, direction=direction)
+            # Reset progress button
+            reset_label = "Reset Progress" if mode == 'practice' else "Reset Mistakes Progress"
+            if st.button(reset_label):
+                if mode == 'practice':
+                    practice_session.reset_practice_progress(direction)
+                else:
+                    practice_session.reset_mistakes_progress(direction)
+                practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
+                st.success(f"{reset_label} has been reset.")
+                st.rerun()
+
         with col2:
-            if st.button('Remove this question'):
-                remove_current_question(practice_session, cookies, mode=mode, direction=direction)
+            # Option to download progress
+            if st.button("Download progress"):
+                # Save current progress data
+                progress_json = practice_session.save_progress_data(cookies, drive_manager=st.session_state['drive_manager'], user_folder_id=st.session_state['user_folder_id'])
+
+                # Create a download button
+                st.download_button(
+                    label="Download Progress",
+                    data=progress_json,
+                    file_name=f"{practice_session.exercise_name}_{mode}_progress.json",
+                    mime="application/json"
+                )
         with col3:
             if st.button("Pronounce Answer"):
                 pronounce_answer(practice_session) 
