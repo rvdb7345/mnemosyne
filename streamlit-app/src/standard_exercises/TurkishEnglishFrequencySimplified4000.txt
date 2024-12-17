@@ -1,0 +1,1000 @@
+hane	house
+kafes	cage
+kemer	belt
+beraberlik	unity; tie, draw
+rüşvet	bribe, bribery
+fil	elephant
+emekçi	worker, laborer
+habersiz	uninformed, unaware
+fen	natural science
+balıkçı	fisherman, fisher
+kulübe	hut, cabin, shack
+sunum	presentation
+fuar	fair
+intikam	revenge
+nihai	final, last
+gecekondu	squatter
+görkemli	splendid, magnificent
+kokla	to smell, to sniff
+uygunluk	appropriateness, compatibility
+birazdan	soon
+keçi	goat
+kurgu	fiction
+kilit	lock
+sinirli	angry, irritated
+ikiz	twin
+ispat	proof, evidence
+cesur	courageous, brave
+kazı	(n) excavation (v) to scrape
+çatla	to crack
+engin	open, vast, boundless
+heves	passing desire, fancy
+özdeşleş	to identify with
+meslektaş	colleague
+malum	known
+terle	to sweat
+misal	example
+iskele	wharf, pier, dock
+gram	gram
+ayrıcalık	privilege, favor
+yeğen	nephew, niece
+yazım	writing
+ciğer	liver; lungs
+gereksin	to be in need of
+tava	frying pan
+nazar	point of view; the evil eye
+olanaklı	possible
+birliktelik	togetherness, cooperation
+konuşmacı	speaker, announcer
+muhasebe	accounting
+sosyoloji	sociology
+açıkçası	frankly
+biber	pepper
+acayip	strange, odd
+figür	figure
+deve	camel
+trend	trend, tendency
+karşıtlık	contrast
+sara	epilepsy
+şarkıcı	singer
+tahrip	destruction
+üçgen	triangular
+bürokrat	bureaucrat
+zorlu	difficult, hard
+mesel	proverb, saying
+mantıklı	logical
+inle	to moan
+sopa	stick
+derinleş	to deepen
+yılbaşı	New Year’s Day
+tepsi	tray
+nadir	rare
+tanıdık	familiar
+vasıf	quality, attribute
+elçi	ambassador
+arala	to space, to open out
+miting	meeting, demonstration
+cin	genie
+mineral	mineral
+plak	record
+aşiret	tribe
+çember	circle
+sayım	count, census
+diploma	diploma
+fazlasıyla	exceedingly, more than enough
+sürat	speed
+mantar	mushroom, fungus
+tebliğ	verdict, decree
+hain	traitor
+mühim	important
+tahammül	patience, endurance
+canavar	monster
+yayla	plateau
+kraliçe	queen
+hammadde	raw material
+rasyonel	rational
+gazetecilik	journalism
+saldırgan	aggressive, assailant
+yatay	horizontal
+global	global
+yiğit	brave
+gevşe	to loosen
+asılı	hanging
+sınırsız	unlimited, unrestricted
+felsefi	philosophical
+kus	to vomit
+soyadı	family name
+kıskançlık	jealousy
+serin	cool, chilly
+alaka	interest, concern
+memnuniyet	pleasure, contentment
+mezhep	sect
+kararname	decree
+adli	judicial, juridical
+yerleşik	settled, established
+vizyon	vision
+çikolata	chocolate
+saz	a stringed instrument; weed
+randevu	appointment
+tutarlı	consistent, coherent
+esneklik	elasticity, flexibility
+oyala	to delay
+sarf	expenditure
+atak	(n) attack (adj) rash, daring
+taşıyıcı	porter, carrier, motorized transport
+değişken	changeable; variable
+bayağı	coarse; considerably, extremely
+namus	honor, integrity
+söylenti	rumor
+ortaçağ	the Middle Ages
+militan	militant
+ritim	rhythm
+katman	layer, stratum
+ilahi	sermon; divine
+şifre	password
+üçlü	triple
+aksa	to hamper, to hinder
+antik	antique, old
+ayırım	discrimination; distinction
+çubuk	rod, bar
+evrak	document, paper
+uzantı	extension
+bileşim	composition
+yüzük	ring
+telgraf	telegraph
+sepet	basket
+döşe	to furnish
+çeşme	fountain
+pislik	dirt, filth
+mevduat	deposits
+üs	military base
+yetenekli	talented
+üre	to produce
+kentsel	urban
+klinik	clinic; clinical
+denek	subject
+dilekçe	petition
+sinek	fly, mosquito
+restoran	restaurant
+aşıla	to vaccinate
+belde	county
+harç	mortar; fee
+paha	value
+buhar	steam
+imkansız	impossible
+milliyet	nationality
+enişte	sister’s or aunt’s husband
+euro	euro
+esasen	basically, essentially
+incelik	politeness; slimness
+betimle	to describe
+panel	panel
+zam	increase in price
+kıymetli	valuable, precious
+atış	throwing, shot
+yeti	faculty
+marş	march
+tap	to worship
+hassasiyet	sensitivity
+rastlantı	chance, accident, coincidence
+sistematik	systematic
+hafifle	to lighten
+müessese	institution, establishment
+ham	raw, crude
+tanınmış	famous
+sözcü	spokesperson
+eda	manner
+ısır	to bite
+fiziki	physical
+çam	pine, pine tree
+saatlik	hourly; for X hours
+sürt	to rub
+etmen	factor, agent
+hastalan	to get ill
+tavşan	rabbit
+koskoca	huge
+cari	current
+geçenlerde	lately, recently
+aşı	vaccine
+sürgü	bolt
+güvercin	pigeon
+yeğle	to prefer
+seminer	seminar
+tasfiye	clearance; liquidation
+rezerv	reserve
+mekanik	mechanical
+pirinç	rice
+inek	cow
+hamile	pregnant
+damla	(n) drop (v) to drip
+acık	to get hungry
+şahsiyet	personality
+sapla	to stick
+kutup	pole
+ülkü	ideal
+hırsızlık	theft, robbery
+orkestra	orchestra
+veda	farewell, goodbye
+erişim	access
+hamur	dough, paste
+sivri	sharply pointed
+keyifli	jolly
+limon	lemon
+bölük	company
+yalın	plain, simple, bare
+tank	tank
+ezan	azan, call to prayer
+tekstil	textile
+kabile	clan, tribe
+canlılık	liveliness, vigor
+danışmanlık	consultancy
+zeka	intelligence, intellect
+ikram	offering
+yamaç	slope
+müttefik	ally
+lütuf	favor
+dayanıklı	durable
+yalı	waterside villa
+hormon	hormone
+kova	bucket
+portakal	orange
+şeriat	Islamic law, sharia
+duruşma	court hearing
+hayati	vital
+anlaşmazlık	disagreement
+market	grocery store
+sarışın	blond
+profil	profile
+çizme	boot
+kiraz	cherry
+hamam	Turkish bath, hammam
+kudret	power
+kaymakam	county governor
+alıntı	quotation
+opera	opera
+tutuklu	arrested
+afiş	poster
+örgütsel	organizational
+yenge	sister-in-law, brother’s wife
+uzmanlık	expertise
+koordinasyon	coordination
+resimle	to illustrate
+çevresel	environmental
+modernleş	to become modern
+ihbar	warning
+koleksiyon	collection
+düşkün	addicted
+dengeli	balanced
+atılım	advance, progress
+mecburiyet	compulsion
+telkin	inspiration, suggestion, prompt
+yanık	burn
+kartal	eagle
+sezgi	intuition
+küs	to sulk, to be cross
+depresyon	depression
+perişan	wretched, miserable
+tema	theme
+çözelti	solution
+ünite	unit
+yükseköğretim	higher education
+vefat	death
+karınca	ant
+tercüme	translation
+destan	epic, saga
+yalancı	liar; fake, false
+piyano	piano
+direkt	direct
+kristal	crystal
+karayolu	road, freeway
+martı	gull
+örgü	knitting
+zıt	opposite, contrary
+önerge	proposal, motion
+bakır	copper
+özerk	autonomous
+fay	fault line
+afet	disaster, catastrophe
+keyfi	arbitrary
+disk	disk
+ağırla	to host
+yokuş	upward slope, hill
+uyarınca	in accordance with
+soylu	noble
+çile	suffering, ordeal
+yoğurt	yoghurt
+tamamıyla	entirely, totally, completely
+perşembe	Thursday
+taht	throne
+önderlik	leadership
+kaos	chaos
+kıyas	comparison, comparing
+lastik	rubber
+çarşamba	Wednesday
+hükümdar	ruler, monarch
+fal	fortune-telling
+bok	shit, crap
+küp	cube; caldron
+simgele	to symbolize
+minibüs	minibus
+kızgın	red-hot, angry
+ziraat	agriculture
+eğlenceli	entertaining, amusing
+rahmet	God’s mercy, God’s compassion
+esmer	brunette, dark-skinned
+sıkıntılı	distressed, worried
+zehirle	to poison
+içsel	inner, internal; intrinsic
+pasaport	passport
+öt	to coo
+zedele	to injure, to damage
+yaramaz	useless; naughty
+romantik	romantic
+tapınak	temple
+bıyık	mustache
+şebeke	ring, network
+birader	brother
+mermer	marble
+seks	sex
+psikolog	psychologist
+atıf	attribution, citation
+kibar	kind, gentle, polite
+hür	free
+münasebet	relation
+sunucu	announcer
+eşitsizlik	inequality
+kirlet	to dirty, to pollute
+rekor	record
+savaşçı	combatant, fighter
+getiri	return, profit
+ilham	inspiration
+sömür	to exploit
+tim	team
+cereyan	current
+peri	fairy
+yasemin	jasmine
+mendil	handkerchief
+yapımcı	producer
+çırak	apprentice
+naklet	to transport, to convey
+buyruk	command, decree
+akademi	academy
+fırça	brush
+komut	order, command
+fotoğrafla	to photo, to photograph
+maymun	monkey
+tamir	repair, fixing
+süs	ornament
+tüzük	regulations
+sarar	to turn yellow
+detaylı	detailed
+mağdur	victim
+kaçakçılık	smuggling
+tasvir	portraying, description
+entelektüel	intellectual
+karışıklık	confusion, disorder
+kurultay	general assembly
+çıldır	to go mad, to go insane
+cahil	illiterate, uneducated
+iplik	thread, yarn
+nişan	aim, mark; engagement
+onar	to repair, to restore
+huzursuzluk	uneasiness, disquiet
+motif	motive
+ateşle	to set fire; to ignite
+keman	violin
+övgü	praise
+kaçış	escape, desertion
+sıkıcı	boring
+teselli	consolation, comfort
+ikincil	secondary
+atama	appointment, assignment
+soyutla	to abstract
+mahiyet	content
+papaz	priest
+çarşaf	sheet
+kalınlık	thickness
+endeks	index
+tempo	tempo
+ücretsiz	free of charge
+hareketlilik	mobility, dynamism
+taahhüt	commitment
+şema	diagram, scheme
+anıt	monument
+salak	fool, idiot, stupid
+kışkırt	to provoke
+ilaçla	to apply medicine or pesticides
+makyaj	makeup
+gereğince	in accordance with, as required by, following
+bavul	suitcase, luggage
+halife	caliph
+parlamenter	parliamentarian
+bedava	gratis, free
+meşruiyet	legality
+balon	balloon
+kuramsal	theoretical
+sömürü	exploitation
+buzdolabı	refrigerator
+dağınık	scattered, dispersed; untidy
+yönelim	inclination, tendency
+soba	stove
+ozan	poet
+anayasal	constitutional
+güçsüz	powerless, weak
+kompozisyon	composition
+ciddiyet	seriousness
+bereket	abundance, plenty
+müracaat	application
+müfettiş	inspector
+pişmanlık	regret, remorse
+ücretli	paid
+yadsı	to deny, to reject
+düşünsel	intellectual
+tarafsız	neutral; unbiased
+yüzbaşı	captain
+tarife	tariff
+teminat	guarantee
+aygıt	device
+akademisyen	academician
+rahip	pastor
+ceviz	walnut
+tahrik	provocation
+hüzünlü	sad, melancholic
+nakit	cash
+abone	subscriber
+kazak	pullover
+müsteşar	undersecretary
+tansiyon	blood pressure
+lokma	bite
+çokluk	majority, abundance
+bunal	to be distressed
+zarif	elegant, graceful
+robot	robot
+mafya	mafia
+yanılgı	mistake
+tık	to cram
+hap	pill
+bembeyaz	snow-white
+stüdyo	studio
+geçerlilik	validity
+ezberle	to memorize
+ılık	tepid, lukewarm
+şöhret	fame
+vitamin	vitamin
+kesik	cut
+yağlı	oily, fatty
+berber	barber, hairdresser
+şafak	dawn, daybreak
+sanatsal	artistic
+dindar	religious, pious
+benzin	gas, petrol
+fail	doer, agent
+başörtüsü	scarf
+iliş	to catch on
+takdim	presentation
+portre	portrait
+hakimiyet	sovereignty, dominance
+sempozyum	symposium
+şampiyon	champion
+keder	grief, sorrow
+uyanık	awake; vigilant
+gerilla	guerrilla
+iniş	descent, landing
+ansızın	suddenly, all of a sudden
+lanet	curse
+final	final
+zehirli	poisonous, toxic
+çöküş	collapse
+holding	holding
+lezzet	taste, flavor
+çavuş	sergeant
+salata	salad
+reaktör	reactor
+nem	moisture
+altıncı	sixth
+üstat	master
+gizemli	mystical
+pasif	passive
+çatlak	split
+kaide	rule; base
+tencere	saucepan
+huy	temperament, disposition
+sızla	to ache, to hurt
+yala	to lick, to brush
+bağırsak	intestine
+kitaplık	bookcase
+hatalı	faulty, flawed
+frekans	frequency
+hücum	assault, charge
+sünnet	circumcision
+taşra	countryside
+komiser	police captain
+ayıkla	to clean, to pick, to sort
+gergin	stretched, tight, tense
+bombala	to bomb
+vitrin	showcase, vitrine
+sur	city wall
+demiryolu	railroad, railway
+makul	reasonable, sensible
+doyum	satiety; satisfaction
+bodrum	basement
+iyon	ion
+iflas	bankruptcy
+önemsiz	unimportant
+tebessüm	smile
+diyar	country, land
+eleştirel	critical
+zaaf	weakness
+askı	hanger, hook
+uzmanlaş	to specialize
+valilik	governorship
+yükümlü	liable, obligated
+enformasyon	information
+böbrek	kidney
+mahalli	local
+olgunluk	ripeness; maturity
+yağış	precipitation, rain
+gereç	equipment
+olgun	ripe, mature
+kargaşa	disorder; anarchy
+birincil	primary
+domuz	pig
+öğüt	advice, recommendation
+enzim	enzyme
+kızgınlık	anger
+hidrojen	hydrogen
+zıpla	to jump; to bounce
+uğurla	to bid farewell
+tutsak	captive
+iştah	appetite
+kumar	gambling
+ağırlaş	to slow down
+haberci	messenger, courier
+müzisyen	musician
+müjde	gospel, good news
+kardeşlik	brotherhood
+icap	necessity, requirement
+tedirginlik	uneasiness
+fincan	cup
+ima	implication, hint
+entegrasyon	integration
+demokratikleş	to democratize
+önyargı	prejudice
+dondurma	ice cream
+vilayet	province
+hükmet	to rule, to govern
+eşle	to pair, to match
+kaşı	to scratch
+yudum	sip
+dolmuş	taxi or motorboat which only starts when it is filled up with passengers, jitney
+ödüllendir	to reward
+şayet	if by chance
+sis	fog
+kel	bald
+tümce	sentence
+kısıtlı	limited, restricted
+tebrik	congratulation, congratulating
+konsantrasyon	concentration
+diri	alive; fresh
+savrul	to be thrown away
+kayıtsız	indifferent; unregistered
+ziyaretçi	visitor
+beğeni	good taste
+susa	to get thirsty
+salı	Tuesday
+mimarlık	architecture
+gülüş	laughter
+ihtilal	revolution
+modernizm	modernism
+umutsuzluk	hopelessness
+istiklal	independence
+arzula	to wish, to desire
+boyuna	lengthwise, longitudinally
+tasavvuf	Sufism
+umutsuz	hopeless
+mamul	product
+telsiz	radio; wireless
+feda	sacrifice, sacrificing
+ürper	to shiver
+azim	perseverance
+saadet	bliss, happiness
+yadırga	to find odd
+imparator	emperor
+büsbütün	altogether, completely
+edebi	literary, literal
+öfkelen	to rage, to get angry
+çuval	sack
+demin	just a short time ago
+hukuksal	legal
+sancı	pain, ache
+çınar	plane tree
+güvensizlik	distrust
+üfle	to blow
+suikast	assassination
+tanıklık	testimony
+mermi	bullet, missile
+erk	force, power
+referandum	referendum
+ferman	firman, imperial order
+kısmet	fortune, destiny; kismet
+konakla	to stay
+yazlık	summer house
+faşist	fascist
+belirginleş	to become apparent
+özürlü	disabled
+yorgan	quilt
+demeç	statement, declaration
+bahis	bet; subject
+hakiki	genuine, real
+sanayici	industrialist
+fışkır	to gush out, to spew
+kablo	cable, wire
+tıbbi	medical
+fasıl	section
+dengele	to balance
+ilkin	at first, firstly
+şimşek	lightning
+forum	forum
+ayrımcılık	discrimination
+döngü	cycle
+bağış	donation
+içtenlik	sincerity
+helal	halal
+mırılda	to murmur, to mumble
+hadis	hadith, Quranic verse
+nakil	transfer, transport
+kupa	cup (given as a prize)
+ender	rare, unusual
+mit	myth, legend
+dokunulmazlık	immunity
+marifet	skill, talent
+kokulu	scented, smelly
+seans	session, sitting
+karmaşa	confusion, turmoil
+bitkisel	herbal
+doğuştan	innate, by birth
+kasıt	intention
+fethet	to conquer
+mahrum	deprived
+incir	fig
+sporcu	sportsman, athlete
+boğa	bull
+esirge	to protect
+biçimlendir	to form, to shape
+ilkbahar	spring
+müteahhit	contractor
+rezil	vile
+ihracatçı	exporter, shipper
+gösterici	guide, demonstrator
+boncuk	bead
+koşu	race; jogging
+kürek	shovel
+belgesel	documentary
+amatör	amateur
+kooperatif	cooperative
+maksimum	maximum
+zalim	cruel
+delege	delegate
+bacı	sister
+suçluluk	guilt
+cazip	attractive
+yapıcı	constructive
+nota	musical note; memorandum
+mikrop	germ, microbe
+şah	shah, king
+yatış	to calm down
+ayar	setting, adjustment
+türban	turban
+motivasyon	motivation
+katlet	to massacre, to slay
+yıldönümü	anniversary
+mesai	work
+saygın	prestigious, respected
+kesinti	interruption, cut
+adaylık	candidacy, nomination
+kazanım	gain, advantage
+şemsiye	umbrella
+edim	act, deed
+saltanat	sultanate
+ilişkilendir	to relate to
+mizah	humor
+şuur	consciousness, comprehension
+ekolojik	ecologic, ecological
+mevzu	subject, topic
+umursa	to care, to mind
+titizlik	tidiness
+süslü	ornamented, decorated
+imtihan	test, exam
+itaat	obedience, abidance
+öfkeli	angry, outraged
+kadı	kadi
+devral	to take over
+bitim	end
+sonsuzluk	eternity
+alıkoy	to withhold, to detain, to keep
+yalanla	to deny
+cevher	ore, essence
+ense	nape, back of the neck
+krallık	kingdom
+burs	scholarship, grant
+prenses	princess
+endüstriyel	industrial
+keza	likewise, so and so
+dijital	digital
+intikal	transition
+savcılık	attorney general
+sözgelimi	for example, for instance
+paragraf	paragraph
+ispatla	to prove
+kurgula	to envisage
+mübarek	sacred, holy
+kayalık	rocky
+rehberlik	guidance, counselling
+mikrofon	microphone
+eşsiz	unique
+fiilen	de facto
+prova	rehearsal
+biricik	dear, one and only
+hapset	to imprison, to jail
+birazcık	a little bit
+kararsız	hesitant; unstable
+duyumsa	to feel, to sense
+komutanlık	commandership
+istifade	benefit, exploitation, profit
+yozlaş	to degenerate
+versiyon	version
+soykırım	genocide
+kolej	private high school
+tüzel	legal, juridical
+tutanak	official report, minutes
+aktarım	transfer, transposition
+salgı	secretion
+minare	minaret
+azap	torment, anguish
+planlı	planned
+sonuncu	last, final
+yelpaze	hand fan
+şişman	fat
+eksi	minus
+meçhul	nameless, unknown
+durgunluk	serenity; stagnation
+yengeç	crab
+gitgide	gradually, more and more
+mini	mini, small
+çağrışım	connotation
+samimiyet	sincerity, warmth, intimacy
+alışık	familiar, accustomed to
+sadakat	loyalty
+ustalık	proficiency, mastery
+şüpheli	doubtful, suspicious
+sömürge	colony
+beste	composition, tune
+etkileyici	impressive
+uşak	male servant
+hizmetçi	maid, servant
+kronik	chronic
+kubbe	dome, sky
+yelken	sail, canvas
+irkil	to be startled
+yaya	pedestrian
+azot	nitrogen
+köfte	meatball
+imha	annihilation; destruction
+nazik	polite, gentle, kind
+galeri	gallery
+parametre	parameter
+cüzdan	wallet
+aşın	to erode
+türbe	tomb
+pilav	rice dish, pilaf
+sera	greenhouse
+zahmet	trouble, bother
+idrak	perception, intelligence
+yıpran	to wear out, to lose drive
+lisan	language
+geyik	deer, stag
+bor	boron
+füze	rocket, missile
+sihirli	magical, bewitched
+kumandan	commander
+kımılda	to move
+şahsi	private, personal
+hukukçu	lawyer
+hiyerarşi	hierarchy
+seramik	ceramic
+iğrenç	disgusting
+nişanlı	engaged
+iştirak	participation; sharing
+huzurlu	peaceful, calm
+tahvil	bond
+sik	(v) to make love; (n) penis
+biçimle	to format
+bilişim	informatics, cyber
+diplomatik	diplomatic
+yaban	wilderness, wildlife
+bedensel	bodily, physical
+pop	pop
+coş	to overflow; to become exuberant
+element	element
+kıç	ass, butt
+küre	globe, sphere
+karakteristik	characteristic
+dürüstlük	honesty
+şevk	enthusiasm
+nöbetçi	guard, watchman
+kot	jeans; altitude
+berbat	awful, horrible
+teneke	tin
+olimpiyat	Olympic, Olympiad
+yankı	echo, reflection
+çanak	bowl, pot
+tıkla	to click, to knock
+infaz	execution
+adliye	courthouse
+incecik	very thin, slim
+bilanço	balance sheets
+turistik	touristic
+sakallı	bearded
+bilgili	well-informed, learned
+haram	wrong, unlawful
+dekor	decoration
+kalça	hip
+bilinçlen	to become conscious
+donanma	navy
+huzursuz	uneasy
+sicil	register, record
+müsait	available, suitable, convenient
+patent	patent
+çivi	nail
+talip	suitor, candidate
+bilinçaltı	subconscious
+metro	subway, metro
+güçleş	to get hard, to grow difficult
+ivme	acceleration, momentum
+fındık	hazelnut
+saçmala	to talk nonsense
+ısmarla	to order, to request
+lobi	lobby; lounge
+töre	moral laws, custom
+sarsıntı	quake, shake
+enteresan	interesting
+sabun	soap
+öngörü	foresight, anticipation
+istikamet	direction
+sertlik	hardness, toughness
+skandal	scandal
+meyhane	pub
+kesinleş	to become definite
+gözetim	supervision, care; protection
+dikey	vertical
+gözlemci	observer
+kuzen	cousin
+star	star
+rivayet	rumor
+orantılı	proportional, balanced
+ebeveyn	parents, parentage
+yedinci	seventh
+komünizm	communism
+karala	to cross out, to scratch, to smear
+gür	loud, thick
+katla	to fold over; to double
+yıkıcı	destructive, devastating
+yaşar	to become wet, to water
+sertifika	certificate
+haşla	to boil
+diril	to revive, to be refreshed
+muzaffer	victorious
+mükellef	taxpayer
+yeşer	to leaf out, to become green
+güzelleş	to become beautiful
+davul	drum
+kil	clay
+köpük	foam, bubble
+kusursuz	flawless, perfect
+yoldaş	comrade, companion
+içgüdü	instinct
+imtiyaz	privilege, concession
+zat	person, individual
+koro	chorus
+kıvran	to agonize
+istikrarlı	steady, stable
+iyimser	optimistic
+dul	widow, widower
+himaye	patronage, protection
+naylon	nylon
+taksit	payment, installment
+saygınlık	prestige
+hayvancılık	stock farming
+ebedi	eternal, endless
+kodla	to encode
+iddialı	assertive
+cansız	inanimate, lifeless
+mahsus	special to, unique to
+mobil	mobile
+güdü	drive, motivation
+biyoloji	biology
+birkaçı	some of them
+istekli	willing
+tövbe	repentance
+şükran	gratitude, appreciation
+maya	yeast
+tilki	fox
+marjinal	marginal
+litre	liter
+poz	pose
+mola	break, pause
+saçmalık	nonsense
+harekat	operation
+işlevsel	functional
+ıssız	uninhabited
+sulu	watery, juicy
+duyuru	announcement
+sımsıkı	very tight
+beter	worse
+bulanık	muddy, not clear
+palto	coat
+konservatuvar	conservatory, music education
+modernlik	modernity
+gizem	mystery, enigma
+işçilik	labor, workmanship
+asansör	elevator, lift
+sahiplen	to embrace
+irtibat	contact, connection, link
+onarım	repair, restoration
+tuş	button, key
+karton	cardboard
+bildirim	notice, declaration
+gölgele	to overshadow, to cloud
+yenik	defeated
+ergenlik	puberty, adolescence
+fasulye	bean, beans
+görüntüle	to film
+fidan	sapling
+azarla	to reprehend
+örneklem	sampling
+rönesans	Renaissance
+tapu	title, deed
+formasyon	formation, training
+çürük	rotten, decay
+stat	stadium
+taciz	harassment
+hatun	lady, woman
+derya	sea, ocean
+davetli	invited
+yağla	to oil, to grease
+tertemiz	spotless
+taviz	compromise
+rant	rent; income
+yörünge	orbit, trajectory
+salgın	epidemic
+çatal	fork, bifurcation
+sancak	flag
+yüzleş	to face
+nar	pomegranate
+mürekkep	ink
+solu	to breathe
+döküm	casting
+çimento	cement
+koz	leverage
+dengesizlik	imbalance
+zayıflık	weakness
+çalışkan	hardworking
+sakinleş	to calm
+cetvel	ruler, scale, schedule
+filiz	offshoot, bud
+akrep	scorpion
+yetim	orphan
+başrol	lead, leading role
+hile	trick, cheat
+azıcık	just a little bit, very small
+delir	to go mad
+entegre	integrated
+parçacık	particle
+şov	show
+asil	noble
+kavim	tribe
+öznel	subjective
+karbon	carbon
+feryat	cry, scream
+eğitimci	educator, trainer
+coşkun	emotional; excited

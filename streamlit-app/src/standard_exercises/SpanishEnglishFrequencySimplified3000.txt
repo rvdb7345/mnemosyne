@@ -1,0 +1,1000 @@
+suma	sum, amount, summary
+cita	appointment, date, quotation
+completar	to complete
+resolución	resolution
+examen	examination, exam +o
+patrón	employer, landlord, patron saint
+azúcar	sugar
+distribución	distribution
+composición	composition, makeup, essay
+diseñar	to design, develop
+alcalde	mayor
+facilidad	ease, facility
+inferior	lower, inferior
+convocar	to convene, summon
+fracaso	failure, collapse
+infancia	infancy, childhood
+habilidad	ability, skill, talent
+misterio	mystery
+japonés	Japanese
+solitario	solitary, lonely
+adelantar	to move forward
+justamente	just, exactly
+pecado	sin
+orilla	shore, edge
+cotidiano	daily
+pedazo	piece, bit
+símbolo	symbol
+bebé	baby
+incrementar	to increase
+primario	primary
+efectuar	to carry out, cause to happen
+taller	workshop, shop
+ensayo	essay, rehearsal
+favorecer	to favor, help
+regional	regional
+petróleo	oil, petroleum
+traducir	to translate
+continuo	continuous
+boliviano	Bolivian
+baile	dance, ball
+tiro	throw, shot
+dominicano	Dominican
+cárcel	jail, prison
+detrás	behind
+borrar	to erase
+secundario	secondary
+carecer	to be without
+crimen	crime, murder
+liberal	liberal
+canto	singing, chant
+disponible	available
+coronel	colonel
+invadir	to invade, overcome
+oponer	to oppose
+deportivo	sports, sporty
+caballero	gentleman, knight
+sabio	wise, learned
+laboratorio	laboratory
+oriental	Eastern, oriental
+músico	musician
+ampliar	to enlarge, increase, expand
+dama	lady, dame
+material	material
+ciego	blind
+oficio	job, occupation, function
+frecuente	frequent
+sede	headquarters, seat
+grueso	thick
+gol	goal
+concentrar	to concentrate
+tejido	fabric, tissue
+rendir	"[se] to give in; to render"
+alternativa	alternative
+claramente	clearly
+renunciar	to give up, renounce
+anuncio	advertisement, announcement
+encuesta	poll, survey, inquiry
+admirar	to admire
+disparar	to shoot (at)
+múltiple	multiple, many
+alegre	happy, lively, cheerful
+piano	piano
+virtud	virtue, quality
+salto	jump, hop, skip
+tela	cloth, fabric
+ave	bird
+asamblea	assembly
+permiso	permission, permit
+ancho	wide
+mancha	stain, spot
+pata	leg, paw
+preparado	prepared
+equilibrio	balance
+núcleo	nucleus, core
+oreja	ear
+asiento	seat, chair
+profundidad	depth, profundity
+atractivo	attractive
+jurar	to swear, take an oath
+preparación	preparation, training
+aceite	oil
+árabe	Arab
+distrito	district, area
+Internet	Internet
+cantante	singer
+patria	native land, fatherland
+león	lion
+sabor	taste, flavor, sensation
+derivar	to derive, come (from)
+definitivamente	definitely, finally
+global	global, overall
+atmósfera	atmosphere, environment
+reserva	reservation, reserve
+divertir	to amuse, entertain
+gobernar	to govern
+cuerda	cord, rope
+entrega	delivery
+satisfacción	satisfaction
+cadáver	corpse, body
+ópera	opera
+magnífico	magnificent, splendid
+brillar	to shine, twinkle, be outstanding
+milagro	miracle
+académico	academic
+negociación	negotiation
+paseo	walk, ride
+palma	palm tree, palm
+aprendizaje	learning, apprenticeship
+publicidad	advertising, publicity
+meta	goal, aim, purpose
+impulso	impulse, momentum
+acumular	to accumulate, amass
+onda	wave, ripple
+llover	to rain
+invertir	to invest
+definición	definition
+madrugada	dawn, daybreak
+torre	tower
+tabla	chart, board, table, plank
+perfil	profile, outline
+práctico	practical, skillful
+disciplina	discipline, subject
+móvil	mobile
+notable	outstanding, noteworthy
+especializado	specialized, skilled
+significado	meaning
+salario	salary, wages
+inicial	initial
+criatura	creature, child
+pista	clue, track, trace
+lago	lake
+digno	worthy
+rumbo	direction, course, bearing
+probable	probable
+cigarrillo	cigarette
+orgullo	pride
+contratar	to hire, contract
+instrucción	instruction
+desempeñar	to carry out, fulfill
+misa	(religious) Mass
+repartir	to divide, deliver, distribute
+desconocer	to not know, not recognize
+corrupción	corruption
+barato	inexpensive
+asustar	to frighten, scare
+pesado	heavy, boring, tiresome
+inteligente	intelligent
+padecer	to suffer
+mezcla	mixture, blend
+penetrar	to penetrate, come in
+inspirar	to inspire, inhale
+adaptar	to adapt
+colectivo	collective, joint
+agitar	to shake, move
+evidencia	evidence, certainty
+finalizar	to end, finalize
+automóvil	automobile
+venezolano	Venezuelan
+caro	expensive, difficult, dear
+episodio	episode, incident
+cuarto	fourth
+recientemente	recently
+rasgo	feature, trait
+latinoamericano	Latin American
+rezar	to pray, recite
+concurso	competition, gathering
+deber	duty, obligation
+elevado	elevated, high, lofty
+odiar	to hate
+calificar	to grade, rate, qualify
+especialista	specialist
+gobernador	governor
+escritura	writing, scripture
+concentración	concentration, gathering
+promesa	promise
+centrar	to center, focus, base (on)
+detectar	to detect
+cultivar	to cultivate, produce
+fortuna	fortune, fate
+productor	producer
+adivinar	to guess, solve
+vosotros	you (subj-pl/+fam)
+síntoma	symptom
+vital	vital, lively, essential
+transcurrir	to occur, take place
+habitar	to inhabit
+rumor	rumor, murmur
+colaborar	to collaborate, work together
+observación	observation
+amante	lover
+odio	hatred
+diablo	devil
+alianza	alliance
+sed	thirst
+extraer	to extract, take out
+valorar	to value
+sagrado	sacred
+dibujar	to draw, sketch
+fundación	foundation
+emprender	to undertake, embark on
+consulta	consultation, advice
+cinta	tape, ribbon, film, strip
+posiblemente	possibly
+creencia	belief
+turno	"turn, shift; en t. a: around"
+tráfico	traffic, trade
+compuesto	composite, mixed
+sacudir	to shake, jolt
+protesta	objection, protest
+abrazo	hug, embrace
+igualmente	equally
+desgracia	misfortune, bad luck
+funcionamiento	functioning, operation
+palo	stick, pole
+aéreo	aerial, air
+fundamentalmente	fundamentally, basically
+cómodo	comfortable, convenient
+reproducir	to reproduce, repeat
+secar	to dry
+lujo	luxury
+delgado	thin, skinny
+héroe	hero
+silencioso	quiet, silent
+consumidor	consumer
+comprometer	to compromise
+fiscal	fiscal, treasury
+vela	candle, sail, vigil
+testimonio	testimony, evidence
+estrecho	narrow
+proteína	protein
+locura	madness, insanity
+alegrar	to be/make happy
+sillón	armchair, seat
+tesis	thesis, exposition
+íntimo	close, intimate
+presidencial	presidential
+adolescente	adolescent
+talento	talent, skill
+extensión	extension, area, expanse
+distribuir	to distribute, deliver
+satisfecho	satisfied
+nuclear	nuclear
+horizonte	horizon
+recurrir	to resort to
+virgen	virgin
+retrato	portrait, photograph
+claridad	clearness, clarity
+izquierdo	left (opposite of right)
+fórmula	formula
+pelota	ball
+existente	existing
+precisar	to do exactly, specify
+solucionar	to solve, settle
+alrededor	about, around, round
+componente	component, ingredient
+dormitorio	bedroom, dormitory
+denuncia	accusation
+fábrica	factory, manufacture
+respectivo	respective
+toro	bull
+prolongar	to extend, prolong
+delicado	delicate
+cerveza	beer, ale
+reaccionar	to react
+estómago	stomach
+enterrar	to bury
+nieto	grandchild
+dictar	to dictate, announce
+sombrero	hat, sombrero
+creador	creator
+técnico	technician
+progreso	progress
+academia	academy
+vientre	womb, belly
+apariencia	appearance, aspect
+alcohol	alcohol
+sacrificio	sacrifice
+danza	dance
+compositor	composer
+concepción	conception
+seno	breast, bosom, cavity
+terror	terror, horror
+bomba	bomb, explosion, pump
+seguro	insurance
+arquitecto	architect
+entusiasmo	enthusiasm
+desprender	to detach, release, remove
+murmurar	to murmur, whisper, mutter
+adiós	goodbye
+armado	armed
+colaboración	collaboration
+exceso	excess
+liga	league, elastic band
+mapa	map
+ceremonia	ceremony
+pasillo	hall, corridor
+inquietud	restlessness, anxiety
+agrícola	agricultural, farming
+ejecutivo	executive
+limitado	limited
+postura	posture, position, attitude
+presidencia	presidency
+conservador	conservative
+proyectar	to project
+paquete	package, packet
+margen	edge, margin, border, brink
+camión	truck, van, tanker
+creciente	growing, increasing
+guía	guide, leader
+galería	gallery, balcony
+conexión	connection, relationship
+agotar	to exhaust, wear out, run out
+prender	to turn on, apprehend
+dispositivo	device, mechanism
+organizado	organized
+verso	verse, poem
+bañar	to bathe, take a bath
+abarcar	to encompass, comprise
+fantasía	fantasy, fancy
+establecimiento	establishment
+complicado	complicated, complex
+mueble	(piece of) furniture
+dieta	diet
+trato	treatment, manner, agreement
+leyenda	legend
+borracho	drunk
+vengar	to take revenge, avenge
+soviético	Soviet
+señorita	young woman
+huella	trace, track, footstep
+corregir	to correct, rectify
+suspender	to suspend, hang, fail
+media	"average; a m.: halfways"
+legislativo	legislative
+fallar	to fail, miss
+intensidad	intensity, force
+paciencia	patience
+derrota	defeat, loss
+garganta	throat, gorge
+favorito	favorite
+ambiental	environmental
+concebir	to conceive, understand
+misterioso	mysterious
+evaluación	evaluation, assessment
+mejilla	cheek
+garantía	guarantee, warranty
+clavar	to nail
+vocación	vocation, calling
+combatir	to fight against
+seleccionar	to select
+tragedia	tragedy
+promedio	average, middle
+feo	ugly, nasty, rude
+mando	command, authority
+infinito	infinite
+titular	headline, holder
+pálido	pale, ghastly, faded
+oculto	hidden, occult
+tonto	stupid, dumb
+transformación	transformation
+circular	to circulate, go around, flow
+satisfacer	to satisfy
+provenir	to come from, be from
+lógico	logical
+herido	wounded (person)
+fácilmente	easily
+inclusive	including, even
+ideal	ideal (goal)
+alterar	to alter, modify
+computadora	computer
+gota	drop
+sudor	sweat, perspiration
+virus	virus
+escritorio	desk, bureau
+habla	speech, talking
+personalmente	personally
+dignidad	dignity
+profundamente	profoundly, deeply
+tecnológico	technological
+broma	joke
+maravilla	wonder, marvel
+característico	characteristic
+esencia	essence
+transportar	to transport, carry
+estallar	to break out, explode, start
+socio	member, partner
+conquistar	to conquer, win (over)
+nocturno	nocturnal, evening
+enlace	link, connection, bond
+mierda	shit, crap, excrement
+catorce	fourteen
+apertura	opening, beginning
+desesperado	desperate, hopeless
+constitucional	constitutional
+formal	formal, polite
+oeste	west
+obedecer	to obey
+sentencia	(legal) sentence, judgment
+acomodar	to be/make comfortable
+sólido	solid, strong
+sobrar	to be too much, left over
+guiar	to guide, lead, steer
+nave	spacecraft, ship
+interesado	(self-) interested
+ola	wave, billow
+porcentaje	percentage
+localizar	to locate, find, localize
+visitante	visitor
+explotar	to explode, exploit
+sueldo	salary, pay
+eficaz	effective
+descanso	rest, interval, break
+expulsar	to expel, throw out
+hábito	habit
+euro	euro
+avisar	to inform, announce
+pasaje	fare, passage, lane
+espectador	spectator, onlooker
+promoción	promotion
+costado	side, flank
+doctrina	doctrine, teachings
+exportación	export, exportation
+anteriormente	previously
+defecto	defect
+preocupado	worried, concerned
+bandera	flag
+agricultura	agriculture, farming
+pisar	to step on
+curar	to cure
+corona	crown
+doblar	to bend, turn
+gubernamental	governmental
+partícula	particle
+extremo	extreme
+atrapar	to trap, catch
+ascender	to ascend, be promoted
+sospechar	to suspect, suppose
+comparación	comparison
+noventa	ninety
+cesar	to cease, stop
+eco	echo, response
+escolar	school, scholastic
+parlamento	parliament, dialogue
+regular	to regulate, adjust
+divertido	funny, amusing
+desierto	desert
+novedad	latest news, newness
+incremento	increase, raise
+foro	forum
+redondo	round
+castigo	punishment, penalty
+abordar	to board, get in/on
+boda	marriage, wedding
+castigar	to punish
+prisa	hurry
+civilización	civilization
+tragar	to swallow
+depósito	deposit, sediment
+basura	garbage, rubbish
+escándalo	scandal
+tranquilidad	tranquility, peace
+conveniencia	convenience, usefulness
+genético	genetic
+combinación	combination
+liberación	liberation
+pintado	painted
+biblia	Bible
+digital	digital
+llanto	crying, weeping
+mentir	to (tell a) lie
+sindicato	trade union
+aeropuerto	airport
+fallecer	to pass away (to die)
+vegetal	plant, vegetable
+lamentar	to regret
+desplazar	to replace, move, shift
+beneficiar	to benefit
+complicar	to complicate, make difficult
+marino	marine, naval
+rabia	rage
+fantástico	fantastic, unreal
+escultura	sculpture, carving
+manejo	handling, management
+combate	combat, battle, fight
+incapaz	incapable
+difundir	to spread (out)
+tumba	tomb, grave
+exclusivo	exclusive
+multitud	multitude
+aspirar	to aspire, want
+evaluar	to evaluate, assess
+suelto	loose
+contigo	with you
+fantasma	ghost, phantom
+copia	copy
+agudo	sharp, acute
+violar	to violate, trespass, rape
+mágico	magic, magical
+procedente	coming (from)
+horrible	horrible
+doméstico	domestic
+horario	schedule, timetable
+calentar	to warm, heat
+depositar	to deposit, place, store
+conquista	conquest
+flotar	to float, flutter
+exclusivamente	exclusively
+parecer	opinion, looks
+despierto	awake
+reto	challenge, defiance
+ridículo	ridiculous, absurd
+desastre	disaster
+utilización	use, utilization
+requisito	prerequisite, requirement
+originar	to give rise (to), cause
+encabezar	to head, lead (off)
+optar	to choose, opt for
+extenso	extensive, large
+gen	gene
+índice	index, forefinger
+dorado	golden, gold-plated
+cena	dinner
+consideración	consideration, regard
+plataforma	platform, springboard
+castillo	castle
+semilla	seed
+rural	rural, country
+miseria	misery, wretchedness
+turismo	tourism
+humilde	humble, modest
+vendedor	salesperson
+té	tea
+supremo	supreme
+examinar	to examine, inspect
+orientación	orientation, direction
+relativamente	relatively
+varón	male, man
+visible	visible
+productivo	productive, profitable
+cerro	hill
+reflexionar	to reflect, consider on
+muñeca	doll, wrist
+diferenciar	to differentiate, distinguish
+huelga	strike, protest
+reducción	reduction
+seguidor	follower, supporter, fan
+residencia	residence
+instancia	instance
+sierra	mountain range, saw
+asesinar	to murder, assassinate
+seguida	en s.: right away, at once
+propietario	owner
+autónomo	autonomous
+lección	lesson
+reemplazar	to replace
+apellido	last name
+alimentación	feeding, food
+uña	nail, fingernail, toenail
+proporción	proportion
+docente	teacher
+estadio	stadium
+oriente	East
+auxiliar	aide, auxiliary
+filósofo	philosopher
+cansar	to tire, annoy
+torneo	tournament
+sufrimiento	suffering
+eje	axis, shaft, crux
+captar	to capture, attract
+vincular	to conenct, link, bind
+amanecer	daybreak, dawn
+preso	prisoner
+inaugurar	to inaugurate, start
+descargar	to unleash, unload
+remedio	alternative, cure, solution
+estúpido	stupid, idiotic
+comprensión	understanding
+bienestar	well-being, welfare
+comedor	dining room
+humedad	humidity
+realización	fulfillment, realization
+reflejo	reflection
+jaja	ha ha
+cortina	curtain, screen
+pluma	pen, feather
+solicitud	request, application
+embarazo	pregnancy
+océano	ocean
+recuperación	recovery, recuperation
+deslizar	to slide, glide, slip
+noble	noble
+maldecir	to curse, insult
+constar	to consist of, comprise
+grasa	grease, fat
+forzar	to force
+estancia	stay, stance, ranch
+prisión	prison, imprisonment
+sábana	(bed) sheet
+asesinato	murder, assassination
+protestar	to protest, object
+criar	to bring up, rear
+fama	reputation, fame
+especializar	to specialize, major in
+ordenador	computer
+mito	myth
+expansión	expansion, spreading
+metálico	metallic
+lástima	shame, pity
+logro	success, achievement
+horror	horror, atrocity
+deshacer	to undo, destroy, take apart
+derrotar	to defeat, beat
+lógica	logic
+colega	colleague
+aislado	isolated
+restaurante	restaurant
+valioso	valuable, precious
+mineral	mineral, ore
+cálculo	calculation, calculus
+recorrido	journey, itinerary, route
+vacaciones	vacation
+mandato	mandate, order, command
+veinticinco	twenty-five
+incendio	fire, conflagration
+conductor	driver, conductor
+artificial	artificial
+mediodía	noon, midday
+guerrero	warrior, soldier
+hielo	ice
+audiencia	audience, hearing
+posesión	possession
+emperador	emperor
+asignar	to assign, allocate
+educar	to educate
+mero	mere
+prever	to foresee, anticipate, forecast
+involucrar	to involve
+expectativa	expectation, hope, prospect
+homenaje	homage, tribute
+gratuito	free, arbitrary, gratuitous
+policial	police
+ejecución	performance, execution
+entrabar	to obstruct
+barra	bar, rod, rail
+designar	to designate
+aparentemente	apparently
+pico	"y p.: and a bit; beak, peak"
+tormenta	storm
+herencia	inheritance, legacy
+ejecutivo	executive, manager
+picar	to bite, sting, itch
+estimular	to stimulate, encourage
+mortal	mortal, lethal, deadly
+aliento	breath, courage, spirit
+iluminar	to illuminate, light up
+exclamar	to exclaim
+sencillamente	simply
+solar	solar
+catedral	cathedral
+impresionar	to impress
+príncipe	prince
+pensión	boarding house
+coro	choir, chorus
+pelea	fight, quarrel
+bloque	block
+renovar	to renew, renovate
+dictadura	dictatorship
+orgulloso	proud, arrogant
+cuchillo	knife
+longitud	length, longitude
+joder	to f**k, screw (around/up)
+agujero	hole, opening
+masivo	mass, massive
+anotar	to annotate, jot, note
+doloroso	painful
+sumamente	extremely, highly
+hacienda	ranch
+romántico	romantic
+constantemente	constantly
+trece	thirteen
+opuesto	opposite, contrary
+destrucción	destruction
+pariente	relative
+brotar	to sprout
+guitarra	guitar
+inmóvil	immovable, motionless
+amable	kind, nice, friendly
+separación	separation
+grabación	recording
+fingir	to feign, pretend
+celebración	celebration
+necesariamente	necessarily
+calma	calm, lull
+descripción	description
+músculo	muscle
+dependencia	dependence, dependency
+rendimiento	yield, output, efficiency
+cuadra	(city) block
+recomendación	recommendation
+impresionante	impressive, astonishing
+medicamento	medicine, drug
+asistencia	attendance, assistance
+rogar	to implore, pray, ask
+fiebre	fever, excitement
+aproximar	to come near, closer
+respiración	respiration, breath
+explotación	exploitation, cultivation
+despacho	office, study
+clasificar	to classify, sort, file
+dieciocho	eighteen
+emocional	emotional
+voluntario	voluntary, volunteer
+brasileño	Brazilian
+enfrentamiento	confrontation
+primavera	spring, springlike
+imprimir	to print
+cintura	waist
+adicional	additional
+experimento	experiment
+ajustar	to adjust, tighten
+mediado	mid, middle
+elegante	elegant, smart, stylish
+falda	skirt
+defensor	defender
+sensible	sensitive, sentient
+ansiedad	anxiety
+operativo	operative, operational
+competir	to compete
+proclamar	to proclaim
+orgánico	organic
+excesivo	excessive
+motivar	to motivate, cause
+infierno	hell, inferno
+excepto	except (for)
+infección	infection
+ciudadanía	citizenship, citizens
+intercambio	exchange, interchange
+poético	poetic
+barba	beard
+hueco	hole, cavity
+modificación	modification, alteration
+cooperación	cooperation
+resaltar	to emphasize
+aconsejar	to advise, counsel
+patrimonio	patrimony, inheritance
+tapar	to cover, wrap
+masculino	masculine, manly, male
+selva	forest, jungle
+asociado	associated
+esquema	outline, diagram, plan
+cansancio	tiredness, weariness
+aporte	contribution
+panorama	panorama, landscape
+cuero	leather, skin
+vaca	cow
+primitivo	primitive
+tronco	trunk, torso
+integración	integration
+privilegio	privilege
+especialidad	specialty, specialized field
+musulmán	Moslem, Muslim
+ahogar	to drown, choke, flood
+totalidad	whole, totality
+abundante	abundant, plentiful
+infraestructura	infrastructure
+administrar	to administer, manage
+bebida	drink, beverage
+enfoque	focus, approach
+sensibilidad	sensitivity
+revés	al r.: backwards, upside down, inside out
+cumplimiento	fulfillment, compliment
+particularmente	particularly, personally
+feria	fair, festival
+avanzado	advanced
+evolucionar	to evolve, develop
+uniforme	uniform
+brillo	shine, twinkling, sparkle
+limitación	limitation
+decreto	decree, order
+vigilar	to watch over, guard
+reducido	reduced, limited
+ternura	tenderness
+fortalecer	to fortify
+lesión	injury, wound, harm
+trozo	piece, chunk
+imitar	to imitate, copy, mimic
+desesperación	desperation, exasperation
+tabaco	tobacco, cigarette, cigar
+ejemplar	copy, issue
+culto	worship, cult
+petición	request, petition
+exhibir	to exhibit, show off
+morder	to bite
+psicológico	psychological
+mina	mine
+gigante	giant
+bola	ball, sphere
+telefónico	telephone
+campeón	champion
+tesoro	treasure, thesaurus
+rival	rival
+traducción	translation
+enfocar	to focus
+turista	tourist
+barro	clay, mud
+culpable	guilty
+comandante	commander, commanding officer
+definido	definite
+variable	variable, changeable
+noticias	news
+absorber	to absorb, soak up
+porqué	reason, cause
+multiplicar	to multiply
+pendiente	slope, descent, earring
+coalición	coalition
+copiar	to copy
+caña	cane, reed
+presa	dam, prisoner (f)
+desafío	challenge, provocation
+encendido	turned on, burning
+seda	silk
+consenso	consensus, consent
+obispo	bishop
+localidad	town, locality
+chocar	to crash into, collide with
+radical	radical
+ligar	to tie, link, bind
+sonoro	loud, resounding
+exigencia	requirement, demand
+variación	variation
+cierre	zipper, closing
+últimamente	lately, recently
+conveniente	convenient
+don	courtesy title (m), Mr., gift
+pasajero	passenger
+nervio	nerve
+rodar	to roll, run, scatter
+clasificación	classification
+biológico	biological
+fragmento	fragment, passage
+rubio	blond, fair
+sembrar	to sow, plant
+combustible	fuel
+extrañar	to miss, long for
+igualdad	equality
+enseguida	immediately, at once
+violación	violation, rape
+apostar	to wager, bet
+servidor	servant
+fomentar	to foster, promote, encourage
+utilidad	usefulness, utility
+luminoso	bright, luminous
+duración	duration, length
+demonio	demon, devil
+acoger	to welcome, accept
+maduro	mature, ripe
+villa	village, town
+convicción	conviction
+severo	severe
+difusión	spread, diffusion
+subrayar	to underline, highlight, emphasize
+arroz	rice
+emisión	broadcast, emission
+criminal	criminal
+flujo	flow, tide, discharge
+calmar	to calm, soothe, relieve
+almuerzo	lunch
+transmisión	broadcast, transmission
+titular	to title, call
+genial	brilliant, inspired
+estirar	to stretch, strain
+afirmación	statement, assertion
+cualidad	quality, attribute
+cuestionar	to question
+perfume	perfume
+abandonado	abandoned
+anoche	last night
+senador	senator
+abuso	abuse, misuse
+legislación	legislation
+suceso	event, incident
+anillo	(finger) ring
+penal	penal
+esclavo	slave
+negociar	to negotiate, deal (with/in)
+aroma	aroma
+proseguir	to continue, carry on
+remoto	remote, far-off
+penumbra	semidarkness, twilight
+espectacular	spectacular
+prestigio	prestige
+ilegal	illegal
+drama	drama
+averiguar	to investigate, find out
+aguardar	to wait for, await
+ficción	fiction
+doscientos	two hundred
+programar	to plan, program
+corriente	current, common
+sobrino	nephew
+residir	to reside, live (in)
+carcajada	hearty laughter, guffaw
+convocatoria	call, summons
+naranja	orange (fruit)
+pozo	well, shaft
+debilidad	weakness
+rescatar	to rescue, save
+aviso	warning
+ocupación	occupation, use
+cruel	cruel, harsh
+certeza	certainty
+ácido	acid
+detallar	to detail, itemize
+kilo	kilogram
+leve	slight, trifling, light
+cumbre	summit, top
+licencia	license, permission
+asociar	to associate with
+interminable	endless, interminable
+secretaría	secretary
+pacto	pact, agreement
+anécdota	anecdote
+placa	plaque, plate, badge
+explosión	explosion
+creativo	creative
+formato	format, form
+emergencia	emergency
+barrera	barrier, obstacle
+estrenar	to use for the first time, debut
+convenio	agreement
+olvido	forgetfulness, omission
+cajón	drawer
+amo	master, boss (m)
+cementerio	cemetery, graveyard
+obviamente	obviously
+portar	to behave [se], carry
+integral	comprehensive, integral, built-in
+chiste	joke, funny story
+ruina	ruin, collapse
+empresarial	managerial
+molécula	molecule
+editar	to edit, publish, release
+confusión	confusion
+ayuntamiento	city council, town hall
+genio	genius, disposition
+colonial	colonial
+terrestre	earthly, of the earth
+charlar	to chat, talk
+ángulo	angle
+cable	cable, wiring
+financiar	to finance
+ingeniería	engineering
+atribuir	to attribute
+sabiduría	wisdom, knowledge
+aburrir	to bore, tire
+temporal	temporary
+poblar	to populate, inhabit
+lámpara	lamp
+obstáculo	obstacle
+almacén	warehouse, store
+maíz	corn, maize
+sargento	sergeant
+inevitable	inevitable, unavoidable
+presidir	to preside over
+votación	vote, voting
+pesadilla	nightmare
+toque	touch, ringing, warning
+agenda	diary, agenda, schedule
+rechazo	rejection, refusal
+mérito	worth, merit
+solidaridad	solidarity, togetherness
+billete	ticket, bill, note
+aprobación	approval, consent
+tibio	lukewarm
+reproducción	reproduction
+grano	grain, kernel
+paralelo	parallel
+reforzar	to reinforce, strengthen
+mantenimiento	maintenance, sustenance
+invitación	invitation
