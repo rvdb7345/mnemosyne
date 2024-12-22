@@ -110,7 +110,6 @@ class PracticeSession:
                 last_feedback_message=practice_data.get('last_feedback_message', None),
                 practice_started=practice_data.get('practice_started', False)
             )
-            random.shuffle(self.practice_sets[direction].word_list)
             
             # Load Mistakes Set
             mistakes_data = progress_data.get('mistakes_sets', {}).get(direction, {})
@@ -121,7 +120,6 @@ class PracticeSession:
                 last_feedback_message=mistakes_data.get('last_feedback_message', None),
                 practice_started=mistakes_data.get('practice_started', False)
             )
-            random.shuffle(self.mistakes_sets[direction].word_list)
 
     def reset_practice_progress(self, direction):
         """Reset the progress for the specified practice direction."""
@@ -248,4 +246,3 @@ class PracticeSession:
             self.mistakes[direction].append(word_pair)
             if direction in self.mistakes_sets:
                 self.mistakes_sets[direction].word_list.append(word_pair)
-                random.shuffle(self.mistakes_sets[direction].word_list)
