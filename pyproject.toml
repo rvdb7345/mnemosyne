@@ -5,7 +5,6 @@ description = ""
 authors = ["Robin <robin@vespertool.com>"]
 license = "mit"
 readme = "README.md"
-packages = [ { include = "*", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
