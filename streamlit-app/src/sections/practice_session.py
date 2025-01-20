@@ -36,6 +36,7 @@ class PracticeSession:
     # Direction-specific sets
     practice_sets: dict = field(default_factory=dict)
     mistakes_sets: dict = field(default_factory=dict)
+    context_sets: dict = field(default_factory=dict)
 
     # Pronunciation
     pronounce_answer_trigger: bool = False
@@ -123,6 +124,21 @@ class PracticeSession:
                 last_feedback_message=mistakes_data.get('last_feedback_message'),
                 practice_started=mistakes_data.get('practice_started', False)
             )
+            context_data = progress_data.get('context_sets', {})
+            
+        self.context_sets = {}
+        for direction in [
+            f"{self.source_language} to {self.target_language}",
+            f"{self.target_language} to {self.source_language}"
+        ]:
+            cset_data = context_data.get(direction, {})
+            self.context_sets[direction] = PracticeSet(
+                word_list=cset_data.get('word_list', []),
+                progress=cset_data.get('progress', []),
+                current_index=cset_data.get('current_index', 0),
+                last_feedback_message=cset_data.get('last_feedback_message'),
+                practice_started=cset_data.get('practice_started', False)
+            )
 
     def reset_practice_progress(self, direction):
         """Reset the practice set for a given direction."""
@@ -207,6 +223,30 @@ class PracticeSession:
             # Create a new file
             drive_manager.upload_file_to_directory(local_path, user_folder_id, mime_type='application/json')
 
+    def setup_context_sets(self):
+        """
+        Initialize or reset the context_sets similarly to practice_sets.
+        Only call this if you want to set up brand new context sets for all directions.
+        """
+        self.context_sets = {}
+        directions = [
+            f"{self.source_language} to {self.target_language}",
+            f"{self.target_language} to {self.source_language}"
+        ]
+        for direction in directions:
+            # We can reuse the same PracticeSet type
+            pset = PracticeSet(
+                word_list=self.original_word_list.copy(),
+                progress=[],
+                current_index=0,
+                last_feedback_message=None,
+                practice_started=False
+            )
+            random.shuffle(pset.word_list)
+            self.context_sets[direction] = pset
+
+        self.save_progress_data()
+
     def save_progress_data(self, drive_manager=None, user_folder_id=None, async_save=True):
         """
         Serializes the current session into JSON and optionally uploads to Google Drive.
@@ -220,7 +260,8 @@ class PracticeSession:
             'exercise_data': self.exercise_df.to_dict('records') if self.exercise_df is not None else [],
             'mistakes': self.mistakes,
             'practice_sets': {},
-            'mistakes_sets': {}
+            'mistakes_sets': {},
+            'context_sets': {}
         }
 
         # Fill practice_sets data
@@ -241,6 +282,15 @@ class PracticeSession:
                 'current_index': mset.current_index,
                 'last_feedback_message': mset.last_feedback_message,
                 'practice_started': mset.practice_started
+            }
+            
+        for direction, cset in self.context_sets.items():
+            progress_data['context_sets'][direction] = {
+                'word_list': cset.word_list,
+                'progress': cset.progress,
+                'current_index': cset.current_index,
+                'last_feedback_message': cset.last_feedback_message,
+                'practice_started': cset.practice_started
             }
 
         # Convert to JSON
