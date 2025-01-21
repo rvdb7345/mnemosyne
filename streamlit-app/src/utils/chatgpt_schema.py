@@ -7,5 +7,5 @@ from pydantic import BaseModel, Field
 from typing import List
 
 class MultipleChoiceQuestion(BaseModel):
-    sentence: str = Field(..., description="Sentence in target language containing a blank where the translated word fits contextually.")
+    sentence: str = Field(..., description="Sentence in target language containing a blank where the correctly translated word fits contextually.")
     distractors: List[str] = Field(..., description="List of three distractor options that grammatically fit the sentence as alternatives for the correct translation.")

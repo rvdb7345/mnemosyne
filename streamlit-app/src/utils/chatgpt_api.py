@@ -86,8 +86,8 @@ def fetch_multiple_choice_data(
     :return: Parsed MultipleChoiceQuestion or None.
     """
     prompt = (
-        f"Generate a multiple-choice question for language learning.\n\n"
-        f"Word to translate: '{word}'\n"
+        f"Generate a fill-in-the-blank question with multiple-choice options.\n\n"
+        f"Word for the user to translate: '{word}'\n"
         f"Correct translation: '{translated_word}' \n"
         f"Source Language: {from_lang}\n"
         f"Target Language: {to_lang}\n"
