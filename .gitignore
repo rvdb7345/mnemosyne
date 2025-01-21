@@ -9,3 +9,4 @@ __pycache__/
 src/exercises/
 .streamlit/
 .env
+temp_downloads/
