@@ -2,14 +2,15 @@ import logging
 from typing import Optional, Type, TypeVar
 from openai import OpenAI
 from pydantic import BaseModel, ValidationError
-from .chatgpt_schema import ChatGPTMultipleChoiceResponse, MultipleChoiceQuestion
+from .chatgpt_schema import MultipleChoiceQuestion
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Define a generic type for Pydantic models
-T = TypeVar('T', bound=BaseModel)
+T = TypeVar("T", bound=BaseModel)
+
 
 def get_chatgpt_response(
     prompt: str,
@@ -17,7 +18,7 @@ def get_chatgpt_response(
     client: OpenAI,
     model: str = "gpt-4o-mini",
     temperature: float = 0.7,
-    max_tokens: int = 300
+    max_tokens: int = 300,
 ) -> Optional[T]:
     """
     Sends a prompt to the ChatGPT API with Structured Outputs and returns the parsed response.
@@ -35,20 +36,23 @@ def get_chatgpt_response(
         response = client.beta.chat.completions.parse(
             model=model,
             messages=[
-                {"role": "system", "content": "You are a helpful assistant for language learning."},
-                {"role": "user", "content": prompt}
+                {
+                    "role": "system",
+                    "content": "You are a helpful assistant for language learning.",
+                },
+                {"role": "user", "content": prompt},
             ],
             temperature=temperature,
             max_tokens=max_tokens,
-            response_format=schema
+            response_format=schema,
         )
-        
+
         message = response.choices[0].message
-        if hasattr(message, 'parsed') and message.parsed:
+        if hasattr(message, "parsed") and message.parsed:
             parsed_response = message.parsed
             logger.info("Received and parsed response from ChatGPT API.")
             return parsed_response
-        elif hasattr(message, 'refusal'):
+        elif hasattr(message, "refusal"):
             logger.warning(f"ChatGPT API refused the request: {message.refusal}")
             return None
         else:
@@ -62,7 +66,15 @@ def get_chatgpt_response(
         logger.error(f"Unexpected error: {e}")
         return None
 
-def fetch_multiple_choice_data(word: str, translated_word: str, from_lang: str, to_lang: str, difficulty: str, client: OpenAI) -> Optional[MultipleChoiceQuestion]:
+
+def fetch_multiple_choice_data(
+    word: str,
+    translated_word: str,
+    from_lang: str,
+    to_lang: str,
+    difficulty: str,
+    client: OpenAI,
+) -> Optional[MultipleChoiceQuestion]:
     """
     Constructs the prompt and fetches multiple-choice data from ChatGPT.
 
@@ -71,7 +83,7 @@ def fetch_multiple_choice_data(word: str, translated_word: str, from_lang: str, 
     :param to_lang: Target language.
     :param difficulty: Difficulty level.
     :param client: OpenAI client instance.
-    :return: Parsed ChatGPTMultipleChoiceResponse or None.
+    :return: Parsed MultipleChoiceQuestion or None.
     """
     prompt = (
         f"Generate a fill-in-the-blank question with multiple-choice options.\n\n"
@@ -81,5 +93,5 @@ def fetch_multiple_choice_data(word: str, translated_word: str, from_lang: str, 
         f"Target Language: {to_lang}\n"
         f"Difficulty Level: {difficulty}\n\n"
     )
-    
+
     return get_chatgpt_response(prompt, MultipleChoiceQuestion, client, max_tokens=300)

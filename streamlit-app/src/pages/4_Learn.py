@@ -8,13 +8,14 @@ from sections.components import apply_custom_css, render_feedback
 from sections.practice_session import PracticeSession, PracticeSet
 from utils.helpers import tts_audio, LANGUAGE_OPTIONS
 from utils.chatgpt_api import fetch_multiple_choice_data
-from utils.chatgpt_schema import ChatGPTMultipleChoiceResponse, MultipleChoiceQuestion
+from utils.chatgpt_schema import MultipleChoiceQuestion
 import openai
 from openai import OpenAI  # Updated import based on new SDK
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 def app():
     st.title("ChatGPT Context Practice")
@@ -23,51 +24,58 @@ def app():
     # Sidebar: API Key Input
     st.sidebar.header("Configuration")
     api_key_input = st.sidebar.text_input("OpenAI API Key", type="password")
-
-    openai.api_key = api_key_input
+    if "api_key" not in st.session_state:
+        st.session_state.api_key = api_key_input
+        openai.api_key = api_key_input
 
     if not api_key_input:
-        st.sidebar.warning("Please enter your OpenAI API Key to enable ChatGPT functionalities.")
+        st.sidebar.warning(
+            "Please enter your OpenAI API Key to enable ChatGPT functionalities."
+        )
         st.stop()  # Stop execution until API key is provided
 
     # Instantiate OpenAI client with the provided API key
     client = OpenAI(api_key=api_key_input)
 
     # Retrieve or initialize PracticeSession from session state
-    practice_session: PracticeSession = st.session_state.get('practice_session', None)
+    practice_session: PracticeSession = st.session_state.get("practice_session", None)
     if not practice_session:
-        st.error("No active practice session found. Please go to Main Menu to start/load an exercise.")
+        st.error(
+            "No active practice session found. Please go to Main Menu to start/load an exercise."
+        )
         return
 
     # Let user choose configuration options
     st.sidebar.header("Settings")
     # Select difficulty level
     difficulty_levels = ["A1", "A2", "B1", "B2", "C1", "C2"]
-    selected_difficulty = st.sidebar.selectbox("Select Difficulty Level:", difficulty_levels)
+    selected_difficulty = st.sidebar.selectbox(
+        "Select Difficulty Level:", difficulty_levels
+    )
 
     # Show directions
     directions = [
         f"{practice_session.source_language} to {practice_session.target_language}",
-        f"{practice_session.target_language} to {practice_session.source_language}"
+        f"{practice_session.target_language} to {practice_session.source_language}",
     ]
     selected_direction = st.selectbox("Direction:", directions)
 
     # Show word sets
-    word_set_options = ['full list', 'mistakes']
+    word_set_options = ["full list", "mistakes"]
     selected_word_set = st.selectbox("Word set:", word_set_options)
 
     # Map selected_word_set to the corresponding context set
-    if selected_word_set == 'full list':
+    if selected_word_set == "full list":
         context_set = practice_session.context_sets.get(selected_direction)
-        word_set_key = 'context_sets'
+        word_set_key = "context_sets"
     else:
         context_set = practice_session.mistakes_context_sets.get(selected_direction)
-        word_set_key = 'mistakes_context_sets'
+        word_set_key = "mistakes_context_sets"
 
     # Initialize the context set if not already initialized
     if not context_set:
         context_set = PracticeSet()
-        if selected_word_set == 'full list':
+        if selected_word_set == "full list":
             practice_session.context_sets[selected_direction] = context_set
         else:
             practice_session.mistakes_context_sets[selected_direction] = context_set
@@ -76,7 +84,9 @@ def app():
 
     # Populate context set if empty
     if not context_set.word_list:
-        fill_context_set_from_source(practice_session, context_set, selected_direction, selected_word_set)
+        fill_context_set_from_source(
+            practice_session, context_set, selected_direction, selected_word_set
+        )
         # Save after initialization
         practice_session.save_progress_data()
 
@@ -86,7 +96,9 @@ def app():
     total_words = len(pset.word_list)
 
     if total_words == 0:
-        st.info(f"No words available for {selected_direction} in '{selected_word_set}' set.")
+        st.info(
+            f"No words available for {selected_direction} in '{selected_word_set}' set."
+        )
         return
 
     progress_frac = min(current_index / total_words, 1.0)
@@ -127,7 +139,7 @@ def app():
                 from_lang=src_lang,
                 to_lang=tgt_lang,
                 difficulty=selected_difficulty,
-                client=client
+                client=client,
             )
             if mcq_response:
                 st.session_state["mcq_data"] = mcq_response
@@ -150,9 +162,7 @@ def app():
         # Display multiple-choice options
         st.markdown("**Choose the correct translation:**")
         user_selection = st.radio(
-            "Options:",
-            options=st.session_state["options"],
-            key="mcq_options"
+            "Options:", options=st.session_state["options"], key="mcq_options"
         )
 
     # Button to submit answer
@@ -160,7 +170,7 @@ def app():
         context_set.last_feedback_message = None  # clear previous feedback
         if user_selection.strip().lower() == correct_translation.strip().lower():
             feedback = f"Correct! Your answer: **{user_selection}**"
-            context_set.last_feedback_message = ('success', feedback)
+            context_set.last_feedback_message = ("success", feedback)
             update_context_progress(
                 correct=True,
                 word_in_from_lang=word_to_translate,
@@ -169,14 +179,14 @@ def app():
                 practice_session=practice_session,
                 pset=pset,
                 direction=selected_direction,
-                word_set=selected_word_set
+                word_set=selected_word_set,
             )
         else:
             feedback = (
                 f"Incorrect! Your answer: **{user_selection}**. "
                 f"Correct answer: **{correct_translation}**"
             )
-            context_set.last_feedback_message = ('error', feedback)
+            context_set.last_feedback_message = ("error", feedback)
             update_context_progress(
                 correct=False,
                 word_in_from_lang=word_to_translate,
@@ -185,7 +195,7 @@ def app():
                 practice_session=practice_session,
                 pset=pset,
                 direction=selected_direction,
-                word_set=selected_word_set
+                word_set=selected_word_set,
             )
 
         # Clear the mcq_data for the next word
@@ -212,16 +222,20 @@ def app():
         col1, col2, col3 = st.columns(3)
         with col1:
             # Reset progress
-            reset_label = "Reset Progress" if selected_word_set == 'full list' else "Reset Mistakes Progress"
+            reset_label = (
+                "Reset Progress"
+                if selected_word_set == "full list"
+                else "Reset Mistakes Progress"
+            )
             if st.button(reset_label):
-                if selected_word_set == 'full list':
+                if selected_word_set == "full list":
                     practice_session.reset_context_progress(selected_direction)
                 else:
                     practice_session.reset_mistakes_context_progress(selected_direction)
                 practice_session.save_progress_data(
-                    drive_manager=st.session_state.get('drive_manager'),
-                    user_folder_id=st.session_state.get('user_folder_id'),
-                    async_save=True
+                    drive_manager=st.session_state.get("drive_manager"),
+                    user_folder_id=st.session_state.get("user_folder_id"),
+                    async_save=True,
                 )
                 st.success(f"{reset_label} has been reset.")
                 st.rerun()
@@ -230,27 +244,28 @@ def app():
             if st.button("Download progress"):
                 # Save current progress data
                 progress_json = practice_session.save_progress_data(
-                    drive_manager=st.session_state.get('drive_manager'),
-                    user_folder_id=st.session_state.get('user_folder_id'),
-                    async_save=False  # to ensure we have a local copy before download
+                    drive_manager=st.session_state.get("drive_manager"),
+                    user_folder_id=st.session_state.get("user_folder_id"),
+                    async_save=False,  # to ensure we have a local copy before download
                 )
                 # Download button
                 st.download_button(
                     label="Download Progress",
                     data=progress_json,
                     file_name=f"{practice_session.exercise_name}_context_{selected_word_set}_progress.json",
-                    mime="application/json"
+                    mime="application/json",
                 )
 
         with col3:
             if st.button("Pronounce Answer"):
                 pronounce_answer(practice_session)
 
+
 def fill_context_set_from_source(practice_session, context_set, direction, word_set):
     """
     Fills the given 'context_set' with words from the normal practice set or mistakes set for 'direction'.
     """
-    if word_set == 'full list':
+    if word_set == "full list":
         base_set = practice_session.practice_sets.get(direction)
     else:
         base_set = practice_session.mistakes_sets.get(direction)
@@ -265,22 +280,40 @@ def fill_context_set_from_source(practice_session, context_set, direction, word_
     context_set.progress = []
     context_set.last_feedback_message = None
 
-def update_context_progress(correct, word_in_from_lang, correct_translation, word_pair, practice_session, pset, direction, word_set):
+
+def update_context_progress(
+    correct,
+    word_in_from_lang,
+    correct_translation,
+    word_pair,
+    practice_session,
+    pset,
+    direction,
+    word_set,
+):
     """
     Record progress in context_sets or mistakes_context_sets, increment index, and save.
     """
     pset.last_feedback_message = None
     if correct:
-        pset.last_feedback_message = ("success", f"Correct! The translation is '{correct_translation}'.")
+        pset.last_feedback_message = (
+            "success",
+            f"Correct! The translation is '{correct_translation}'.",
+        )
     else:
-        pset.last_feedback_message = ("error", f"Incorrect. The correct translation is '{correct_translation}'.")
+        pset.last_feedback_message = (
+            "error",
+            f"Incorrect. The correct translation is '{correct_translation}'.",
+        )
 
     # Record progress
-    pset.progress.append({
-        "word": word_in_from_lang,
-        "correct_translation": correct_translation,
-        "correct": correct
-    })
+    pset.progress.append(
+        {
+            "word": word_in_from_lang,
+            "correct_translation": correct_translation,
+            "correct": correct,
+        }
+    )
 
     pset.current_index += 1
     # Clamp if needed
@@ -288,29 +321,31 @@ def update_context_progress(correct, word_in_from_lang, correct_translation, wor
         pset.current_index = len(pset.word_list)
 
     # Update mistakes context if incorrect
-    if not correct and word_set == 'mistakes':
+    if not correct and word_set == "mistakes":
         practice_session.add_mistakes_context(word_pair, direction)
-    elif correct and word_set == 'mistakes':
+    elif correct and word_set == "mistakes":
         practice_session.remove_mistakes_context(word_pair, direction)
 
     # Save
     practice_session.save_progress_data(
-        drive_manager=st.session_state.get('drive_manager'),
-        user_folder_id=st.session_state.get('user_folder_id'),
-        async_save=True
+        drive_manager=st.session_state.get("drive_manager"),
+        user_folder_id=st.session_state.get("user_folder_id"),
+        async_save=True,
     )
     st.rerun()
+
 
 def pronounce_answer(practice_session: PracticeSession):
     """Play TTS audio for the last known answer."""
     if practice_session.pronounce_answer_text:
         audio_html = tts_audio(
             practice_session.pronounce_answer_text,
-            practice_session.pronounce_answer_lang
+            practice_session.pronounce_answer_lang,
         )
         st.markdown(audio_html, unsafe_allow_html=True)
     else:
         st.markdown("No answer to pronounce yet.", unsafe_allow_html=True)
+
 
 if __name__ == "__main__":
     app()
