@@ -3,13 +3,13 @@
 from pydantic import BaseModel
 from typing import List
 
-class SentenceWithBlank(BaseModel):
-    sentence_with_blank: str
-    correct_translation: str
+from pydantic import BaseModel, Field
+from typing import List
 
-class ChatGPTUsageResponse(BaseModel):
-    word_from_language: str
-    sentences: List[SentenceWithBlank]
+class MultipleChoiceQuestion(BaseModel):
+    sentence: str = Field(..., description="Sentence in target language containing a blank where the translated word fits contextually.")
+    distractors: List[str] = Field(..., description="List of three distractor options that grammatically fit the sentence as alternatives for the correct translation.")
 
-class ChatGPTSynonymsResponse(BaseModel):
-    synonyms: List[str]
+class ChatGPTMultipleChoiceResponse(BaseModel):
+    sentence: str = Field(..., description="Sentence with a blank.")
+    distractors: List[str] = Field(..., description="List of three distractor translations.")

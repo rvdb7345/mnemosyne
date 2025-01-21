@@ -1,10 +1,8 @@
-# src/utils/chatgpt_api.py
-
 import logging
 from typing import Optional, Type, TypeVar
 from openai import OpenAI
 from pydantic import BaseModel, ValidationError
-from .chatgpt_schema import ChatGPTUsageResponse, ChatGPTSynonymsResponse
+from .chatgpt_schema import ChatGPTMultipleChoiceResponse, MultipleChoiceQuestion
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -17,7 +15,7 @@ def get_chatgpt_response(
     prompt: str,
     schema: Type[T],
     client: OpenAI,
-    model: str = "gpt-4o-2024-08-06",
+    model: str = "gpt-4o-mini",
     temperature: float = 0.7,
     max_tokens: int = 300
 ) -> Optional[T]:
@@ -63,3 +61,25 @@ def get_chatgpt_response(
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
         return None
+
+def fetch_multiple_choice_data(word: str, translated_word: str, from_lang: str, to_lang: str, difficulty: str, client: OpenAI) -> Optional[MultipleChoiceQuestion]:
+    """
+    Constructs the prompt and fetches multiple-choice data from ChatGPT.
+
+    :param word: The word to translate.
+    :param from_lang: Source language.
+    :param to_lang: Target language.
+    :param difficulty: Difficulty level.
+    :param client: OpenAI client instance.
+    :return: Parsed ChatGPTMultipleChoiceResponse or None.
+    """
+    prompt = (
+        f"Generate a multiple-choice question for language learning.\n\n"
+        f"Word to translate: '{word}'\n"
+        f"Correct translation: '{translated_word}' \n"
+        f"Source Language: {from_lang}\n"
+        f"Target Language: {to_lang}\n"
+        f"Difficulty Level: {difficulty}\n\n"
+    )
+    
+    return get_chatgpt_response(prompt, MultipleChoiceQuestion, client, max_tokens=300)
