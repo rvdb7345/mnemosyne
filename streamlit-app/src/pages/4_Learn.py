@@ -161,12 +161,15 @@ def app():
 
         # Display multiple-choice options
         st.markdown("**Choose the correct translation:**")
-        user_selection = st.radio(
-            "Options:", options=st.session_state["options"], key="mcq_options"
-        )
+        
+        with st.form(key=f'answer_form', clear_on_submit=True):
+            user_selection = st.radio(
+                "Options:", options=st.session_state["options"], key="mcq_options"
+            )
+            submit = st.form_submit_button(label='Submit')
 
     # Button to submit answer
-    if st.button("Submit Answer"):
+    if submit:
         context_set.last_feedback_message = None  # clear previous feedback
         if user_selection.strip().lower() == correct_translation.strip().lower():
             feedback = f"Correct! Your answer: **{user_selection}**"
@@ -332,7 +335,6 @@ def update_context_progress(
         user_folder_id=st.session_state.get("user_folder_id"),
         async_save=True,
     )
-    st.rerun()
 
 
 def pronounce_answer(practice_session: PracticeSession):
