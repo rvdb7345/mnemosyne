@@ -16,6 +16,11 @@ from openai import OpenAI  # Updated import based on new SDK
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def clear_mcq_data():
+    if "mcq_data" in st.session_state:
+        del st.session_state["mcq_data"]
+    if "options" in st.session_state:
+        del st.session_state["options"]
 
 def app():
     st.title("ChatGPT Context Practice")
@@ -50,7 +55,7 @@ def app():
     # Select difficulty level
     difficulty_levels = ["A1", "A2", "B1", "B2", "C1", "C2"]
     selected_difficulty = st.sidebar.selectbox(
-        "Select Difficulty Level:", difficulty_levels
+        "Select Difficulty Level:", difficulty_levels, on_change=clear_mcq_data
     )
 
     # Show directions
@@ -58,11 +63,13 @@ def app():
         f"{practice_session.source_language} to {practice_session.target_language}",
         f"{practice_session.target_language} to {practice_session.source_language}",
     ]
-    selected_direction = st.selectbox("Direction:", directions)
+    selected_direction = st.selectbox("Direction:", directions, on_change=clear_mcq_data)
+    
+    known_language = st.sidebar.selectbox("Known Language:", [practice_session.source_language, practice_session.target_language], on_change=clear_mcq_data)
 
     # Show word sets
     word_set_options = ["full list", "mistakes"]
-    selected_word_set = st.selectbox("Word set:", word_set_options)
+    selected_word_set = st.selectbox("Word set:", word_set_options, on_change=clear_mcq_data)
 
     # Map selected_word_set to the corresponding context set
     if selected_word_set == "full list":
@@ -136,8 +143,9 @@ def app():
             mcq_response = fetch_multiple_choice_data(
                 word=word_to_translate,
                 translated_word=correct_translation,
-                from_lang=src_lang,
-                to_lang=tgt_lang,
+                known_language=known_language,
+                from_lang=selected_direction.split(" to ")[0],
+                to_lang=selected_direction.split(" to ")[1],
                 difficulty=selected_difficulty,
                 client=client,
             )
@@ -150,14 +158,14 @@ def app():
             mcq_data: MultipleChoiceQuestion = st.session_state["mcq_data"]
 
             # Assemble multiple-choice options
-            options = mcq_data.distractors + [correct_translation]
+            options = mcq_data.answer_options
             random.shuffle(options)
             st.session_state["options"] = options
 
     if "mcq_data" in st.session_state:
         # Display sentence with blank
         st.markdown("**Sentence with Blank:**")
-        st.markdown(st.session_state["mcq_data"].sentence)
+        st.markdown(st.session_state["mcq_data"].question_sentence)
 
         # Display multiple-choice options
         st.markdown("**Choose the correct translation:**")
@@ -171,7 +179,7 @@ def app():
     # Button to submit answer
     if submit:
         context_set.last_feedback_message = None  # clear previous feedback
-        if user_selection.strip().lower() == correct_translation.strip().lower():
+        if user_selection.strip().lower() == st.session_state["mcq_data"].correct_answer.strip().lower():
             feedback = f"Correct! Your answer: **{user_selection}**"
             context_set.last_feedback_message = ("success", feedback)
             update_context_progress(
@@ -187,13 +195,13 @@ def app():
         else:
             feedback = (
                 f"Incorrect! Your answer: **{user_selection}**. "
-                f"Correct answer: **{correct_translation}**"
+                f"Correct answer: **{st.session_state['mcq_data'].correct_answer}**"
             )
             context_set.last_feedback_message = ("error", feedback)
             update_context_progress(
                 correct=False,
                 word_in_from_lang=word_to_translate,
-                correct_translation=correct_translation,
+                correct_translation=st.session_state["mcq_data"].correct_answer,
                 word_pair=current_word_pair,
                 practice_session=practice_session,
                 pset=pset,
@@ -207,7 +215,10 @@ def app():
 
     # Button to reveal the correct translation
     if st.button("Reveal Translation"):
-        st.info(f"The correct translation is: **{correct_translation}**")
+        st.info(f"The correct translation is: **{st.session_state['mcq_data'].correct_answer}**")
+        
+    if st.button("Reveal Sentence Translation"):
+        st.info(f"{st.session_state['mcq_data'].full_sentence_translation}")
 
     # TTS Buttons
     col1, col2 = st.columns(2)
@@ -301,12 +312,12 @@ def update_context_progress(
     if correct:
         pset.last_feedback_message = (
             "success",
-            f"Correct! The translation is '{correct_translation}'.",
+            f"Correct! The translation of {word_in_from_lang} is '{correct_translation}'.",
         )
     else:
         pset.last_feedback_message = (
             "error",
-            f"Incorrect. The correct translation is '{correct_translation}'.",
+            f"Incorrect. The correct translation of {word_in_from_lang} is '{correct_translation}'.",
         )
 
     # Record progress

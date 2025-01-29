@@ -11,7 +11,6 @@ logger = logging.getLogger(__name__)
 # Define a generic type for Pydantic models
 T = TypeVar("T", bound=BaseModel)
 
-
 def get_chatgpt_response(
     prompt: str,
     schema: Type[T],
@@ -22,14 +21,6 @@ def get_chatgpt_response(
 ) -> Optional[T]:
     """
     Sends a prompt to the ChatGPT API with Structured Outputs and returns the parsed response.
-
-    :param prompt: The prompt string to send to the API.
-    :param schema: The Pydantic model defining the JSON schema.
-    :param client: The instantiated OpenAI client.
-    :param model: The model to use.
-    :param temperature: Sampling temperature.
-    :param max_tokens: Maximum number of tokens in the response.
-    :return: Parsed response object or None if an error occurs.
     """
     try:
         logger.info("Sending prompt to ChatGPT API with Structured Outputs.")
@@ -38,7 +29,10 @@ def get_chatgpt_response(
             messages=[
                 {
                     "role": "system",
-                    "content": "You are a helpful assistant for language learning.",
+                    "content": (
+                        "You are a language teacher creating a fill-in-the-blank question with multiple-choice "
+                        "options for the given word."
+                    ),
                 },
                 {"role": "user", "content": prompt},
             ],
@@ -67,9 +61,25 @@ def get_chatgpt_response(
         return None
 
 
+def determine_learning_direction(from_lang: str, known_language: str) -> str:
+    """
+    Determines whether the user is going from a 'known to unknown' language
+    or 'unknown to known', based on whether `from_lang` matches the user's known language.
+    
+    :param from_lang: The language of the word shown to the user.
+    :param known_language: The language the user already speaks.
+    :return: A string "known_to_unknown" if `from_lang` == known_language,
+             otherwise "unknown_to_known".
+    """
+    if from_lang.lower() == known_language.lower():
+        return "known_to_unknown"
+    return "unknown_to_known"
+
+
 def fetch_multiple_choice_data(
     word: str,
     translated_word: str,
+    known_language: str,
     from_lang: str,
     to_lang: str,
     difficulty: str,
@@ -77,21 +87,55 @@ def fetch_multiple_choice_data(
 ) -> Optional[MultipleChoiceQuestion]:
     """
     Constructs the prompt and fetches multiple-choice data from ChatGPT.
-
-    :param word: The word to translate.
-    :param from_lang: Source language.
-    :param to_lang: Target language.
-    :param difficulty: Difficulty level.
-    :param client: OpenAI client instance.
-    :return: Parsed MultipleChoiceQuestion or None.
     """
-    prompt = (
-        f"Generate a fill-in-the-blank question with multiple-choice options.\n\n"
-        f"Word for the user to translate: '{word}'\n"
-        f"Correct translation: '{translated_word}' \n"
-        f"Source Language: {from_lang}\n"
-        f"Target Language: {to_lang}\n"
-        f"Difficulty Level: {difficulty}\n\n"
-    )
 
-    return get_chatgpt_response(prompt, MultipleChoiceQuestion, client, max_tokens=300)
+    # Build the prompt text based on 'direction'
+    # - "known_to_unknown": The user sees a known-language word (word),
+    #   must produce answers in the target language (translated_word).
+    # - "unknown_to_known": The user sees an unknown-language word (translated_word),
+    #   must produce answers in the known language (word).
+
+    # NOTE: The question sentence itself must always be in the target language (to_lang).
+    #       The user’s "known" language is used for answers only when direction=="unknown_to_known".
+
+    direction = determine_learning_direction(from_lang, known_language)
+    unknown_language = from_lang if from_lang != known_language else to_lang
+
+    prompt = f"""
+You are a helpful language-learning assistant that generates a single multiple-choice question.
+
+1. The question sentence must be in {unknown_language}.
+2. It should contain a blank or context for the user to fill with the correct word, which is:
+   - known-language word: '{word}'
+   - target-language word: '{translated_word}'
+3. Provide exactly 4 answer options in {to_lang}, where:
+   - One is the correct '{translated_word}'.
+   - The other 3 are plausible distractors in {to_lang}.
+4. The sentence should reflect a '{difficulty}' level of complexity.
+5. Include an English translation of your question sentence (full_sentence_translation).
+6. Output only the following JSON with no extra keys or text:
+   {{
+     "question_sentence": "...",
+     "answer_options": ["...", "...", "...", "..."],
+     "correct_answer": "...",
+     "full_sentence_translation": "..."
+   }}
+
+Example:
+{{
+  "question_sentence": "Bu ev mavi, o ev ___",
+  "answer_options": ["Buyuk", "Kucuk", "Kahverengi", "Ogretmen"],
+  "correct_answer": "Kahverengi",
+  "full_sentence_translation": "This house is blue, that house is ___"
+}}
+"""
+
+    logger.info(f"Prompt to ChatGPT:\n{prompt}")
+
+    return get_chatgpt_response(
+        prompt,
+        MultipleChoiceQuestion,
+        client,
+        model="gpt-4o-mini",
+        max_tokens=300
+    )
