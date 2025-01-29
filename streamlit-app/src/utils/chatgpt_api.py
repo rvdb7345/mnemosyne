@@ -112,6 +112,7 @@ You are a helpful language-learning assistant that generates a single multiple-c
    - One is the correct '{translated_word}'.
    - The other 3 are plausible distractors in {to_lang}.
 4. The sentence should reflect a '{difficulty}' level of complexity.
+5. The {translated_word} can be conjugated to fit the sentence grammatically.
 5. Include an English translation of your question sentence (full_sentence_translation).
 6. Output only the following JSON with no extra keys or text:
    {{

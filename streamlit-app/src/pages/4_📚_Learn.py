@@ -63,13 +63,18 @@ def app():
         f"{practice_session.source_language} to {practice_session.target_language}",
         f"{practice_session.target_language} to {practice_session.source_language}",
     ]
-    selected_direction = st.selectbox("Direction:", directions, on_change=clear_mcq_data)
+    selected_direction = st.sidebar.selectbox("Direction:", directions, on_change=clear_mcq_data)
     
-    known_language = st.sidebar.selectbox("Known Language:", [practice_session.source_language, practice_session.target_language], on_change=clear_mcq_data)
+    # select your known language with a dirty hack for english to go first
+    known_language_options = [practice_session.source_language, practice_session.target_language]
+    if "English" in known_language_options and not known_language_options[0] == "English":
+        known_language_options.remove("English")
+        known_language_options.insert(0, "English")
+    known_language = st.sidebar.selectbox("Known Language:", known_language, on_change=clear_mcq_data)
 
     # Show word sets
     word_set_options = ["full list", "mistakes"]
-    selected_word_set = st.selectbox("Word set:", word_set_options, on_change=clear_mcq_data)
+    selected_word_set = st.sidebar.selectbox("Word set:", word_set_options, on_change=clear_mcq_data)
 
     # Map selected_word_set to the corresponding context set
     if selected_word_set == "full list":
