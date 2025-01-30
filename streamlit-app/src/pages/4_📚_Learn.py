@@ -1,5 +1,6 @@
 # src/sections/context_practice.py
 
+from typing import Optional
 import streamlit as st
 import random
 import logging
@@ -34,12 +35,18 @@ def app():
     # Sidebar: API Key Input
     st.sidebar.header("Configuration")
     api_key_input = st.sidebar.text_input("OpenAI API Key", type="password")
+    
+
+    
     if "api_key" not in st.session_state and not cookies.get('openai_api_key'):
         st.session_state.api_key = api_key_input
         openai.api_key = api_key_input
         controller.set('openai_api_key', api_key_input)
-    elif "api_key"  in st.session_state or cookies.get('openai_api_key'):
-        api_key_input = st.session_state.api_key if st.session_state.api_key else cookies.get('openai_api_key')
+    elif "api_key" in st.session_state or cookies.get('openai_api_key'):
+        if "api_key" in st.session_state:
+            api_key_input = st.session_state.api_key
+        elif cookies.get('openai_api_key'):
+            api_key_input = cookies.get('openai_api_key')
         openai.api_key = api_key_input 
 
 
@@ -53,7 +60,7 @@ def app():
     client = OpenAI(api_key=api_key_input)
 
     # Retrieve or initialize PracticeSession from session state
-    practice_session: PracticeSession = st.session_state.get("practice_session", None)
+    practice_session: Optional[PracticeSession] = st.session_state.get("practice_session", None)
     if not practice_session:
         st.error(
             "No active practice session found. Please go to Main Menu to start/load an exercise."
