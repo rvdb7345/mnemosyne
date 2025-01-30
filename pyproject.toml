@@ -19,4 +19,6 @@ openai = "^1.55.1"
 transformers = "^4.46.3"
 google-api-python-client = "^2.154.0"
 python-dotenv = "^1.0.1"
+reverso-api = "^0.0.1b3"
+httpx = "0.27.2"
 
