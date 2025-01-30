@@ -70,7 +70,7 @@ def app():
     if "English" in known_language_options and not known_language_options[0] == "English":
         known_language_options.remove("English")
         known_language_options.insert(0, "English")
-    known_language = st.sidebar.selectbox("Known Language:", known_language, on_change=clear_mcq_data)
+    known_language = st.sidebar.selectbox("Known Language:", known_language_options, on_change=clear_mcq_data)
 
     # Show word sets
     word_set_options = ["full list", "mistakes"]
