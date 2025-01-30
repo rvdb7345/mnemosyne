@@ -42,7 +42,11 @@ def main():
     controller.getAll()
     
     # Ask the user for their username
-    username = st.text_input("Enter your username:", key="user_name_input", value=controller.get("username"))
+    if controller.get("username"):
+        cookie_username = controller.get("username")
+    else:
+        cookie_username = ""
+    username = st.text_input("Enter your username:", key="user_name_input", value=cookie_username)
     
     if username:
         controller.set("username", username)
