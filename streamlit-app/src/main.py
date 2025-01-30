@@ -39,8 +39,13 @@ if 'drive_manager' not in st.session_state:
 def main():
     st.title("Vocabulary Practice App")
 
+    controller.getAll()
+    
     # Ask the user for their username
-    username = st.text_input("Enter your username:", key="user_name_input")
+    username = st.text_input("Enter your username:", key="user_name_input", value=controller.get("username"))
+    
+    if username:
+        controller.set("username", username)
 
 
     # We'll load this from environment or .env
