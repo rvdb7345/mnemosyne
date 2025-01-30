@@ -5,9 +5,13 @@
 .venv
 src/exercises/*
 
-__pycache__/
+__pycache__
 src/exercises/
 src/standard_exercises/__pycache__/*
 .streamlit/
 .env
 temp_downloads/
+.DS_Store
+*.csv
+temp_progress/
+.vscode/

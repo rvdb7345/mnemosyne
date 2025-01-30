@@ -11,6 +11,9 @@ from utils.chatgpt_api import fetch_multiple_choice_data
 from utils.chatgpt_schema import MultipleChoiceQuestion
 import openai
 from openai import OpenAI  # Updated import based on new SDK
+from streamlit_cookies_controller import CookieController
+
+controller = CookieController()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -25,13 +28,20 @@ def clear_mcq_data():
 def app():
     st.title("ChatGPT Context Practice")
     apply_custom_css()
+    cookies = controller.getAll()
+
 
     # Sidebar: API Key Input
     st.sidebar.header("Configuration")
     api_key_input = st.sidebar.text_input("OpenAI API Key", type="password")
-    if "api_key" not in st.session_state:
+    if "api_key" not in st.session_state and not cookies.get('openai_api_key'):
         st.session_state.api_key = api_key_input
         openai.api_key = api_key_input
+        controller.set('openai_api_key', api_key_input)
+    elif "api_key"  in st.session_state or cookies.get('openai_api_key'):
+        api_key_input = st.session_state.api_key if st.session_state.api_key else cookies.get('openai_api_key')
+        openai.api_key = api_key_input 
+
 
     if not api_key_input:
         st.sidebar.warning(
