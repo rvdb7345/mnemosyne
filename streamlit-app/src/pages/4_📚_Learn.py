@@ -1,5 +1,6 @@
 # src/sections/context_practice.py
 
+from typing import Optional
 import streamlit as st
 import random
 import logging
@@ -11,6 +12,9 @@ from utils.chatgpt_api import fetch_multiple_choice_data
 from utils.chatgpt_schema import MultipleChoiceQuestion
 import openai
 from openai import OpenAI  # Updated import based on new SDK
+from streamlit_cookies_controller import CookieController
+
+controller = CookieController()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -25,13 +29,26 @@ def clear_mcq_data():
 def app():
     st.title("ChatGPT Context Practice")
     apply_custom_css()
+    cookies = controller.getAll()
+
 
     # Sidebar: API Key Input
     st.sidebar.header("Configuration")
     api_key_input = st.sidebar.text_input("OpenAI API Key", type="password")
-    if "api_key" not in st.session_state:
+    
+
+    
+    if "api_key" not in st.session_state and not cookies.get('openai_api_key'):
         st.session_state.api_key = api_key_input
         openai.api_key = api_key_input
+        controller.set('openai_api_key', api_key_input)
+    elif "api_key" in st.session_state or cookies.get('openai_api_key'):
+        if "api_key" in st.session_state:
+            api_key_input = st.session_state.api_key
+        elif cookies.get('openai_api_key'):
+            api_key_input = cookies.get('openai_api_key')
+        openai.api_key = api_key_input 
+
 
     if not api_key_input:
         st.sidebar.warning(
@@ -43,7 +60,7 @@ def app():
     client = OpenAI(api_key=api_key_input)
 
     # Retrieve or initialize PracticeSession from session state
-    practice_session: PracticeSession = st.session_state.get("practice_session", None)
+    practice_session: Optional[PracticeSession] = st.session_state.get("practice_session", None)
     if not practice_session:
         st.error(
             "No active practice session found. Please go to Main Menu to start/load an exercise."

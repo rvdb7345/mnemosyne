@@ -8,6 +8,9 @@ from sections.practice_session import PracticeSession
 from utils.google_drive import GoogleDriveManager
 from utils.helpers import create_dir
 from utils.file_paths import add_project_to_path, ProjectPaths
+from streamlit_cookies_controller import CookieController
+
+controller = CookieController()
 
 dotenv.load_dotenv(".env")
 
@@ -36,8 +39,17 @@ if 'drive_manager' not in st.session_state:
 def main():
     st.title("Vocabulary Practice App")
 
+    controller.getAll()
+    
     # Ask the user for their username
-    username = st.text_input("Enter your username:", key="user_name_input")
+    if controller.get("username"):
+        cookie_username = controller.get("username")
+    else:
+        cookie_username = ""
+    username = st.text_input("Enter your username:", key="user_name_input", value=cookie_username)
+    
+    if username:
+        controller.set("username", username)
 
 
     # We'll load this from environment or .env
