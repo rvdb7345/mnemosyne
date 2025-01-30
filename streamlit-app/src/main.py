@@ -44,6 +44,9 @@ def main():
     main_progress_folder_id = os.getenv("MAIN_PROGRESS_FOLDER_ID", "")
 
     if not main_progress_folder_id:
+        main_progress_folder_id = st.secrets['other_variables']["MAIN_PROGRESS_FOLDER_ID"]
+
+    if not main_progress_folder_id:
         st.warning("Warning: MAIN_PROGRESS_FOLDER_ID is not set. Google Drive actions may fail.")
 
     # Only proceed once the user has typed something
