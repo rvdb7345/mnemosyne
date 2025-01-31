@@ -38,7 +38,7 @@ def app():
     
 
     
-    if "api_key" not in st.session_state and not cookies.get('openai_api_key'):
+    if "api_key" not in st.session_state and not cookies.get('openai_api_key') and api_key_input:
         st.session_state.api_key = api_key_input
         openai.api_key = api_key_input
         controller.set('openai_api_key', api_key_input)
