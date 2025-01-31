@@ -10,7 +10,6 @@ from utils.helpers import create_dir
 from utils.file_paths import add_project_to_path, ProjectPaths
 from streamlit_cookies_controller import CookieController
 
-controller = CookieController()
 
 dotenv.load_dotenv(".env")
 
@@ -20,6 +19,8 @@ st.set_page_config(
     page_icon=":books:",
     layout="centered",
 )
+
+controller = CookieController()
 
 # Initialize project paths (if you use them)
 pp = ProjectPaths()
